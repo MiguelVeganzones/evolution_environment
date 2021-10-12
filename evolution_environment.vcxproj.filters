@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Archivos de origen">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Archivos de encabezado">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Archivos de recursos">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Archivos de encabezado\parallel_hashmap">
+      <UniqueIdentifier>{031030e0-905b-478c-94a3-989f2178cf57}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="board.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="c4minimax.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="ga_nn.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="non_parallel_minimax.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="Random.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="stopwatch.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="c4_evo_environment.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Archivos de recursos</Filter>
+    </ClCompile>
+    <ClCompile Include="c4_brain.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ga_nn.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="nn_helper_functions.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="non_parallel_minimax.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="Random.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="small_GA_matrix.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="stopwatch.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="board.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="c4minimax.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="c4_evo_environment.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="parallel_hashmap\btree.h">
+      <Filter>Archivos de encabezado\parallel_hashmap</Filter>
+    </ClInclude>
+    <ClInclude Include="parallel_hashmap\meminfo.h">
+      <Filter>Archivos de encabezado\parallel_hashmap</Filter>
+    </ClInclude>
+    <ClInclude Include="parallel_hashmap\phmap.h">
+      <Filter>Archivos de encabezado\parallel_hashmap</Filter>
+    </ClInclude>
+    <ClInclude Include="parallel_hashmap\phmap_base.h">
+      <Filter>Archivos de encabezado\parallel_hashmap</Filter>
+    </ClInclude>
+    <ClInclude Include="parallel_hashmap\phmap_bits.h">
+      <Filter>Archivos de encabezado\parallel_hashmap</Filter>
+    </ClInclude>
+    <ClInclude Include="parallel_hashmap\phmap_config.h">
+      <Filter>Archivos de encabezado\parallel_hashmap</Filter>
+    </ClInclude>
+    <ClInclude Include="parallel_hashmap\phmap_dump.h">
+      <Filter>Archivos de encabezado\parallel_hashmap</Filter>
+    </ClInclude>
+    <ClInclude Include="parallel_hashmap\phmap_fwd_decl.h">
+      <Filter>Archivos de encabezado\parallel_hashmap</Filter>
+    </ClInclude>
+    <ClInclude Include="parallel_hashmap\phmap_utils.h">
+      <Filter>Archivos de encabezado\parallel_hashmap</Filter>
+    </ClInclude>
+    <ClInclude Include="c4_brain.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="parallel_hashmap\conanfile.py">
+      <Filter>Archivos de encabezado\parallel_hashmap</Filter>
+    </None>
+  </ItemGroup>
+</Project>
