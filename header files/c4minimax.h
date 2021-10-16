@@ -4,7 +4,7 @@
 #include <map>
 #include "board.h"
 #include <vector>
-#include "parallel_hashmap/phmap.h"
+#include "../resources/parallel_hashmap/phmap.h"
 
 static constexpr uint_fast8_t sdepth = 10; //calls to minimax  <= sx + sx**2 + .... + sx**sdepth (creo)
 //phmap::parallel_flat_hash_map
