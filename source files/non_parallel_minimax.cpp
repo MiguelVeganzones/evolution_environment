@@ -12,7 +12,7 @@ static thread_local phmap::parallel_flat_hash_map<std::pair<uint64_t, uint64_t>,
 static thread_local phmap::parallel_flat_hash_map<std::pair<uint64_t, uint64_t>, uint_fast8_t> np_seen_boards;
 //static unsigned int counter = 0;
 
-static uint64_t np_count;
+static uint64_t np_count = 0;
 
 static constexpr const std::array<bool, 2> next_player{ 1, 0 };
 

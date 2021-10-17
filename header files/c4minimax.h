@@ -4,12 +4,12 @@
 #include <map>
 #include "board.h"
 #include <vector>
-#include "../resources/parallel_hashmap/phmap.h"
+#include "./parallel_hashmap/phmap.h"
 
-static constexpr uint_fast8_t sdepth = 10; //calls to minimax  <= sx + sx**2 + .... + sx**sdepth (creo)
+//calls to minimax  <= sx + sx**2 + .... + sx**sdepth (creo)
 //phmap::parallel_flat_hash_map
 
-static phmap::parallel_flat_hash_map<std::pair<uint64_t, uint64_t>, uint_fast8_t> computed_boards;
+extern phmap::parallel_flat_hash_map<std::pair<uint64_t, uint64_t>, uint_fast8_t> computed_boards;
 
 uint_fast8_t c4_minimax(const board& prev_board, const bool first_player = 0, const bool out = 1);
 

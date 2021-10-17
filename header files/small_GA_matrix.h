@@ -9,8 +9,12 @@
 #include "Random.h"
 #include <numeric>
 #include <algorithm>
-//#define NDEBUG
 #include <assert.h>
+
+#ifndef NDEBUG
+#define NDEBUG
+#endif // !NDEBUG
+
 
 //----------------------------------------------------------------------
 //

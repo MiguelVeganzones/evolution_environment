@@ -11,7 +11,9 @@
 
 //static std::map<std::pair<uint64_t, uint64_t>, uint_fast8_t> computed_boards;
 
-static uint64_t count;
+static uint64_t count = 0;
+static constexpr uint_fast8_t sdepth = 10; //calls to minimax  <= sx + sx**2 + .... + sx**sdepth (creo)
+static phmap::parallel_flat_hash_map<std::pair<uint64_t, uint64_t>, uint_fast8_t> computed_boards;
 
 std::shared_mutex lock;
 

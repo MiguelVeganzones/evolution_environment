@@ -394,7 +394,7 @@ int main12() {
 	stopwatch s;
 
 	std::vector<uint_fast8_t> _shape = { 6,7,3,3,3,3,1,2 };
-	const char* const file_name("./_c4_brains/prueba1.txt");
+	const char* const file_name("../_c4_brains/prueba1.txt");
 	_c4_brain::c4_brain b(_shape);
 	b.store(file_name);
 
@@ -415,8 +415,8 @@ int main12() {
 
 int main13() {
 	stopwatch s;
-	const char* const file_name1("./_c4_brains/prueba1.txt");
-	const char* const file_name2("./_c4_brains/prueba2.txt");
+	const char* const file_name1("../_c4_brains/prueba1.txt");
+	const char* const file_name2("../_c4_brains/prueba2.txt");
 
 	auto b = _c4_brain::read(file_name1);
 	auto c = _c4_brain::read(file_name2);
@@ -436,7 +436,7 @@ int main14() {
 	std::cout << "\nBrain ID: " << _c4_brain::c4_brain::get_current_ID() << std::endl;
 
 	//np_i_play_ai(&b, 5, random::randint(0,1));
-	const char* const file_name("./_c4_brains/674412_15_3_100.txt");
+	const char* const file_name("../_c4_brains/674412_15_3_100.txt");
 
 	b.store(file_name);
 
@@ -447,11 +447,14 @@ int main14() {
 
 int main() {
 	//random::init();
-	const char* const file_name("./_c4_brains/674412_15_3_100.txt");
+	const char* const file_name("../_c4_brains/674412_15_3_100.txt");
 	const std::vector<uint_fast8_t> _shape({ 6, 7, 4, 4, 1, 2 });
 	auto b = _c4_brain::read(file_name);
 	_c4_brain::c4_brain b1(_shape);
-	std::vector<_c4_brain::c4_brain> p_gen = { &b, &b1 };
+
+	std::cout << b << b1 << std::endl;
+
+	std::vector<_c4_brain::c4_brain*> p_gen = { &b, &b1 };
 
 	//std::vector<_c4_brain::c4_brain> gen;
 	//gen.reserve(15);
@@ -462,7 +465,7 @@ int main() {
 	//auto c = _c4_evo_env::simulate_evolution(_c4_evo_env::breed_new_gen(p_gen, 15, 2, 0.8), 3, 100, 2, 3, 5, 2, 0.3, 10);
 	auto c = _c4_evo_env::simulate_evolution(15, 3, 100, _shape, 2, 3, 5, 2, 0.3, 10);
 
-	const char* const ret_file_name("./_c4_brains/674412_15_3_100_V2.txt");
+	const char* const ret_file_name("../_c4_brains/674412_15_3_100_V2.txt");
 	c.store(ret_file_name);
 
 	return EXIT_SUCCESS;
@@ -470,7 +473,7 @@ int main() {
 
 int main16() {
 
-	const char* const file_name("./_c4_brains/674412_15_3_100.txt");
+	const char* const file_name("../_c4_brains/674412_15_3_100.txt");
 	auto b = _c4_brain::read(file_name);
 
 	np_ai_play_ai(&b, &b, 5, 5, 0, 0, 1);

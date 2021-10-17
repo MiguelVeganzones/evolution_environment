@@ -1,9 +1,12 @@
 #include "ga_nn.h"
 #include <vector>
-//#define NDEBUG
 #include <assert.h>
 #include "board.h"
 #include <fstream>
+
+#ifndef NDEBUG
+#define NDEBUG
+#endif
 
 using namespace _ga_nn;
 

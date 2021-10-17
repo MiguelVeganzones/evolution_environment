@@ -46,7 +46,7 @@ void _c4_evo_env::tournament(const std::vector<_c4_brain::c4_brain*>& prev_gen, 
 	const uint_fast8_t prev_depth, const uint_fast8_t curr_depth, uint_fast8_t nthreads, 
 	const bool print)
 {
-	short int i = 0, n = curr_gen.size(), s = 0;	
+	short unsigned int i = 0, n = curr_gen.size();	
 	std::vector<std::unique_ptr<std::thread>> threads{};
 	std::vector<_c4_brain::c4_brain*> sub_cur_gen;
 
@@ -58,15 +58,16 @@ void _c4_evo_env::tournament(const std::vector<_c4_brain::c4_brain*>& prev_gen, 
 	}
 	indexes.back() = n - 1;
 
-	for (i = 0; i < nthreads - 1; ++i) {
+	for (i = 0; i < nthreads - 1; ++i) { //main threads executes the computation for the end of the vector
 		sub_cur_gen = std::vector<_c4_brain::c4_brain*>(&curr_gen[indexes[i]], &curr_gen[indexes[i + 1]]);
 		//std::cout << "-- Player " << i++ << " --\n";
-		threads.push_back(std::make_unique<std::thread>(std::thread(_c4_evo_env::_round, prev_gen, sub_cur_gen, prev_depth, curr_depth)));
+		threads.push_back(std::make_unique<std::thread>(std::thread(
+			_c4_evo_env::_round, prev_gen, std::move(sub_cur_gen), prev_depth, curr_depth)));
 		//_c4_evo_env::_round(p, curr_gen, prev_depth, curr_depth);
 	}
 
 	sub_cur_gen = std::vector<_c4_brain::c4_brain*>(&curr_gen[indexes[i]], &curr_gen[indexes[i + 1]] + 1);//+1 because range is inclusive
-	_c4_evo_env::_round(prev_gen, sub_cur_gen, prev_depth, curr_depth);
+	_c4_evo_env::_round(prev_gen, std::move(sub_cur_gen), prev_depth, curr_depth);
 
 	for (auto& t : threads) {
 		t->join();

@@ -2,13 +2,8 @@
 # Este archivo .gitignore ha sido creado automáticamente por Microsoft(R) Visual Studio.
 ################################################################################
 
-/.vs/evolution_environment
-/Debug
-/Release
-/parallel_hashmap
-/_c4_brains
-/x64
-/evolution_environment.sln
-/evolution_environment.vcxproj.user
-/evolution_environment.vcxproj
-/evolution_environment.vcxproj.filters
+.vs/
+resources/
+_c4_brains/
+build/
+
