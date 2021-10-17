@@ -1,7 +1,7 @@
 #pragma once
 #include <random>
 
-static class random 
+class random 
 {
 public:
 

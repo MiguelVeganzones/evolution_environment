@@ -46,7 +46,8 @@ void _c4_evo_env::tournament(const std::vector<_c4_brain::c4_brain*>& prev_gen, 
 	const uint_fast8_t prev_depth, const uint_fast8_t curr_depth, uint_fast8_t nthreads, 
 	const bool print)
 {
-	short unsigned int i = 0, n = curr_gen.size();	
+	short unsigned int i = 0;
+	uint_fast8_t n = curr_gen.size();	
 	std::vector<std::unique_ptr<std::thread>> threads{};
 	std::vector<_c4_brain::c4_brain*> sub_cur_gen;
 
@@ -122,7 +123,7 @@ const _c4_brain::c4_brain _c4_evo_env::simulate_evolution_helper(std::vector<_c4
 
 	//random::init();
 	//utiity
-	uint_fast8_t i, j, prev, cur;
+	uint_fast8_t i, j;
 	std::array<uint_fast8_t, 2> gi({ 0,1 }); //gen index
 	std::vector<float> weights(pop_size);
 	std::vector<_c4_brain::c4_brain*> _parents(parents, nullptr);
@@ -231,7 +232,7 @@ std::vector<_c4_brain::c4_brain> _c4_evo_env::breed_new_gen(const std::vector<_c
 {
 	assert((top_n < pop_size) and (mutation_p <= 1) and (mutation_p >= 0) and (parents.size() >= top_n));
 
-	uint_fast8_t i, j, a, b;
+	uint_fast8_t i, a, b;
 	uint_fast8_t meio = make_even(pop_size - top_n), mito = pop_size - meio - top_n;
 	const uint_fast8_t np = parents.size();
 

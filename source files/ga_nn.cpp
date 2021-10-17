@@ -350,8 +350,8 @@ const std::pair<neural_net, neural_net> _ga_nn::crossover(const neural_net& net1
 	for (auto it = std::make_move_iterator(ret_nodes.begin()),
 		end = std::make_move_iterator(ret_nodes.end()); it != end; ++it) 
 	{
-		new_nodes1.push_back(std::move(it->first));
-		new_nodes2.push_back(std::move(it->second));
+		new_nodes1.push_back(it->first);
+		new_nodes2.push_back(it->second);
 	}
 
 	return std::move(std::pair<neural_net, neural_net>(neural_net(_shape, std::move(new_nodes1)), neural_net(_shape, std::move(new_nodes2))));
