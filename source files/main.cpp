@@ -447,6 +447,7 @@ int main14() {
 
 int main() {
 	//random::init();
+	stopwatch s;
 	const char* const file_name("../_c4_brains/674412_15_3_100.txt");
 	const std::vector<uint_fast8_t> _shape({ 6, 7, 4, 4, 1, 2 });
 	auto b = _c4_brain::read(file_name);
@@ -461,7 +462,7 @@ int main() {
 	//for (int i = 0; i < 15; ++i) {
 	//	gen.emplace_back(_shape);
 	//}
-
+	 
 	//auto c = _c4_evo_env::simulate_evolution(_c4_evo_env::breed_new_gen(p_gen, 15, 2, 0.8), 3, 100, 2, 3, 5, 2, 0.3, 10);
 	auto c = _c4_evo_env::simulate_evolution(15, 3, 100, _shape, 2, 3, 5, 2, 0.3, 10);
 
