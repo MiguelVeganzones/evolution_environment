@@ -28,8 +28,7 @@ inline void np_print_vector_pair(const std::vector<std::pair<uint_fast8_t, uint_
 uint_fast8_t np_c4_minimax(const board& prev_board, const _c4_brain::c4_brain* brain, const bool first_player,
 	const uint_fast8_t depth, const bool chain_games, const bool chain_player, const bool print)
 {
-#if chain_games 
-	if (first_player == chain_player) {
+	if ((first_player == chain_player) and chain_games) {
 		const auto it = np_seen_boards.find(prev_board.to_num());
 
 		if (it != np_seen_boards.end()) {
@@ -38,7 +37,6 @@ uint_fast8_t np_c4_minimax(const board& prev_board, const _c4_brain::c4_brain* b
 			return  it->second;
 		}
 	}
-#endif // THERE ARE CHAIN GAMES
 	
 	const auto moves = prev_board.get_moves();
 
@@ -62,10 +60,8 @@ uint_fast8_t np_c4_minimax(const board& prev_board, const _c4_brain::c4_brain* b
 
 	const auto ret = std::max_element(main_w_and_m.begin(), main_w_and_m.end())->second;
 
-#if chain_games
-	if (first_player == chain_player) 
+	if ((first_player == chain_player) and chain_games) 
 		np_seen_boards.insert({ prev_board.to_num(), ret });
-#endif
 
 	return ret;
 }
