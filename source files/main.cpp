@@ -464,7 +464,7 @@ int main() {
 	//}
 	 
 	//auto c = _c4_evo_env::simulate_evolution(_c4_evo_env::breed_new_gen(p_gen, 15, 2, 0.8), 3, 100, 2, 3, 5, 2, 0.3, 10);
-	auto c = _c4_evo_env::simulate_evolution(15, 3, 100, _shape, 2, 3, 5, 2, 0.3, 10);
+	auto c = _c4_evo_env::simulate_evolution(10, 3, 10, _shape, 2, 3, 5, 2, 0.3, 10);
 
 	const char* const ret_file_name("../_c4_brains/674412_15_3_100_V2.txt");
 	c.store(ret_file_name);
