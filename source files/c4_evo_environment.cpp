@@ -2,6 +2,7 @@
 #include "c4_evo_environment.h"
 #include "non_parallel_minimax.h"
 #include <cmath>
+#include <execution>
 
 std::vector<_c4_brain::c4_brain*> _c4_evo_env::selection_operator(const std::vector<_c4_brain::c4_brain*>& brains,
 	const std::vector<float>& winrate, float alpha, uint_fast8_t n)
@@ -43,36 +44,11 @@ std::vector<_c4_brain::c4_brain*> _c4_evo_env::selection_operator(const std::vec
 }
 
 void _c4_evo_env::tournament(const std::vector<_c4_brain::c4_brain*>& prev_gen, const std::vector<_c4_brain::c4_brain*>& curr_gen,
-	const uint_fast8_t prev_depth, const uint_fast8_t curr_depth, uint_fast8_t nthreads, 
-	const bool print)
+	const uint_fast8_t prev_depth, const uint_fast8_t curr_depth, const bool print)
 {
-	short unsigned int i = 0;
-	uint_fast8_t n = curr_gen.size();	
-	std::vector<std::unique_ptr<std::thread>> threads{};
-	std::vector<_c4_brain::c4_brain*> sub_cur_gen;
-
-	if (n < nthreads) { nthreads = n; }
-
-	std::vector<uint_fast8_t> indexes(nthreads + 1, 0);
-	for (i = 1; i < nthreads; ++i) {
-		indexes[i] = n / nthreads + indexes[i - 1];
-	}
-	indexes.back() = n - 1;
-
-	for (i = 0; i < nthreads - 1; ++i) { //main threads executes the computation for the end of the vector
-		sub_cur_gen = std::vector<_c4_brain::c4_brain*>(&curr_gen[indexes[i]], &curr_gen[indexes[i + 1]]);
-		//std::cout << "-- Player " << i++ << " --\n";
-		threads.push_back(std::make_unique<std::thread>(std::thread(
-			_c4_evo_env::_round, prev_gen, std::move(sub_cur_gen), prev_depth, curr_depth)));
-		//_c4_evo_env::_round(p, curr_gen, prev_depth, curr_depth);
-	}
-
-	sub_cur_gen = std::vector<_c4_brain::c4_brain*>(&curr_gen[indexes[i]], &curr_gen[indexes[i + 1]] + 1);//+1 because range is inclusive
-	_c4_evo_env::_round(prev_gen, std::move(sub_cur_gen), prev_depth, curr_depth);
-
-	for (auto& t : threads) {
-		t->join();
-	}
+	std::for_each(std::execution::par_unseq, std::begin(curr_gen), std::end(curr_gen), [&](_c4_brain::c4_brain* curr) {
+		_round(prev_gen, curr, prev_depth, curr_depth);
+		});
 
 	if (print) {
 		for (const auto& e : curr_gen) {
@@ -311,40 +287,40 @@ void _c4_evo_env::check_progress(const std::vector<_c4_brain::c4_brain*>& contro
 
 }
 
-void _c4_evo_env::_round(const std::vector<_c4_brain::c4_brain*>& prev_gen, const std::vector<_c4_brain::c4_brain*>& curr_gen,
+void _c4_evo_env::_round(const std::vector<_c4_brain::c4_brain*>& prev_gen, _c4_brain::c4_brain* curr,
 	const uint_fast8_t prev_depth, const uint_fast8_t curr_depth) {
 	//current plays second
 	_non_parallel_helper_foo::clear_seen_boards();
-	short int res;
-	for (auto& c : curr_gen) {
-		for (auto& p : prev_gen) {
-			res = np_ai_play_ai(p, c, prev_depth, curr_depth, 1, 1);
-			switch (res) {
-			case 0:
-				c->lost();
-				break;
-			case 1:
-				c->won();
-				break;
-			case -1:
-				c->tied();
-				break;
-			}
-			//current plays first
-			res = np_ai_play_ai(c, p, curr_depth, prev_depth, 1, 0);
-			switch (res) {
-			case 0:
-				c->won();
-				break;
-			case 1:
-				c->lost();
-				break;
-			case -1:
-				c->tied();
-				break;
-			}
+	int_fast8_t res;
+	
+	for (const auto& p : prev_gen) {
+		res = np_ai_play_ai(p, curr, prev_depth, curr_depth, 1, 1);
+		switch (res) {
+		case 0:
+			curr->lost();
+			break;
+		case 1:
+			curr->won();
+			break;
+		case -1:
+			curr->tied();
+			break;
 		}
-		_non_parallel_helper_foo::clear_seen_boards();
+		//current plays first
+		res = np_ai_play_ai(curr, p, curr_depth, prev_depth, 1, 0);
+		switch (res) {
+		case 0:
+			curr->won();
+			break;
+		case 1:
+			curr->lost();
+			break;
+		case -1:
+			curr->tied();
+			break;
+		}
 	}
+	_non_parallel_helper_foo::clear_seen_boards();
+	
 }
 

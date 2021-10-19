@@ -22,7 +22,7 @@ namespace _c4_evo_env {
 		const std::vector<float>& winrate, float alpha, uint_fast8_t n);
 
 	void tournament(const std::vector<_c4_brain::c4_brain*>& prev_gen, const std::vector<_c4_brain::c4_brain*>& curr_gen,
-		uint_fast8_t prev_depth, const uint_fast8_t curr_depth, uint_fast8_t nthreads = 5, const bool print = 0);
+		uint_fast8_t prev_depth, const uint_fast8_t curr_depth, const bool print = 0);
 
 		/// <summary>
 		/// This function will randomly generate a population of c4_brains, make them compete against each other, select the fittest individuals
@@ -57,7 +57,7 @@ namespace _c4_evo_env {
 	void check_progress(const std::vector<_c4_brain::c4_brain*>& control_group,
 		const std::vector<_c4_brain::c4_brain*>& cur_gen, const uint_fast8_t depth);
 
-	void _round(const std::vector<_c4_brain::c4_brain*>& prev_gen, const std::vector<_c4_brain::c4_brain*>& curr_gen,
+	void _round(const std::vector<_c4_brain::c4_brain*>& prev_gen, _c4_brain::c4_brain* curr,
 		const uint_fast8_t prev_depth, const uint_fast8_t curr_depth);
 
 	inline float alpha(const uint_fast8_t i, const uint_fast8_t epochs) { return 1 - i / epochs; }

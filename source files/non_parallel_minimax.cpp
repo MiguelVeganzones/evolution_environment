@@ -145,7 +145,7 @@ uint_fast8_t np_minimax(const board& prev_board, const bool max, const bool play
 	}
 }
 
-short int np_ai_play_ai(const _c4_brain::c4_brain* brain1, const _c4_brain::c4_brain* brain2,
+int_fast8_t np_ai_play_ai(const _c4_brain::c4_brain* brain1, const _c4_brain::c4_brain* brain2,
 	uint_fast8_t depth1, uint_fast8_t depth2, const bool chain_games, const bool chain_player, bool print)
 {
 	if (print) {
@@ -216,7 +216,7 @@ short int np_ai_play_ai(const _c4_brain::c4_brain* brain1, const _c4_brain::c4_b
 	return player;
 }
 
-short int np_i_play_ai(const _c4_brain::c4_brain* brain, uint_fast8_t depth, bool ai_first)
+int_fast8_t np_i_play_ai(const _c4_brain::c4_brain* brain, uint_fast8_t depth, bool ai_first)
 {
 	stopwatch global;
 

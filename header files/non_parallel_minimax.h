@@ -20,10 +20,10 @@ uint_fast8_t np_minimax(const board& board, const bool max, const bool player, c
 	const _c4_brain::c4_brain* brain,
 	uint_fast8_t alpha = std::numeric_limits<uint8_t>::min(), uint_fast8_t beta = std::numeric_limits<uint8_t>::max());
 
-short int np_ai_play_ai(const _c4_brain::c4_brain* brain1, const _c4_brain::c4_brain* brain2,
+int_fast8_t np_ai_play_ai(const _c4_brain::c4_brain* brain1, const _c4_brain::c4_brain* brain2,
 	uint_fast8_t depth1, uint_fast8_t depth2, const bool chain_games = 0, const bool chain_player = 0, bool print = 0);
 
-short int np_i_play_ai(const _c4_brain::c4_brain* brain, uint_fast8_t depth, bool ai_first);
+int_fast8_t np_i_play_ai(const _c4_brain::c4_brain* brain, uint_fast8_t depth, bool ai_first);
 
 namespace _non_parallel_helper_foo {
 	void clear_seen_boards();
