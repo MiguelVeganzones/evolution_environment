@@ -25,7 +25,7 @@ struct board
 		}
 	}
 
-	inline board(const board& board, const uint_fast8_t move, const bool player) :state{ board.state }
+	inline board(const board& board, const uint_fast8_t move, const uint_fast8_t player) :state{ board.state }
 	{
 		state[player][move] = true;
 	}
@@ -37,7 +37,7 @@ struct board
 	std::array<std::bitset<size>, 2> state;
 
 	const std::pair<uint64_t, uint64_t> to_num() const;
-	const bool check_move (const uint_fast8_t move, const bool player) const; //player 0 or 1, index for state
+	const bool check_move (const uint_fast8_t move, const uint_fast8_t player) const; //player 0 or 1, index for state
 	const std::vector<uint_fast8_t> get_moves() const;
 	void make_move(const uint_fast8_t move, const uint_fast8_t player);
 	friend std::ostream& operator <<(std::ostream& out, const board& board);

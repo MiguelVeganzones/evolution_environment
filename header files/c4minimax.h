@@ -11,12 +11,12 @@
 
 extern phmap::parallel_flat_hash_map<std::pair<uint64_t, uint64_t>, uint_fast8_t> computed_boards;
 
-uint_fast8_t c4_minimax(const board& prev_board, const bool first_player = 0, const bool out = 1);
+uint_fast8_t c4_minimax(const board& prev_board, const uint_fast8_t first_player = 0, const bool out = 1);
 
-uint_fast8_t minimax(const board&, const bool max, const bool player, const uint_fast8_t move, const uint_fast8_t depth,
+uint_fast8_t minimax(const board&, const bool max, const uint_fast8_t player, const uint_fast8_t move, const uint_fast8_t depth,
 	uint_fast8_t alpha = std::numeric_limits<uint_fast8_t>::min(), uint_fast8_t beta = std::numeric_limits<uint_fast8_t>::max());
 
-void minimax_interface(const board& board, bool player, const uint_fast8_t move, const uint_fast8_t depth, const uint_fast8_t i,
+void minimax_interface(const board& board, uint_fast8_t player, const uint_fast8_t move, const uint_fast8_t depth, const uint_fast8_t i,
 	std::vector<std::pair<uint_fast8_t, uint_fast8_t>>& main_m_and_w);
 
 uint_fast8_t ai_play_ai(const bool out=1);

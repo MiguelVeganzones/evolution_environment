@@ -17,7 +17,7 @@ static phmap::parallel_flat_hash_map<std::pair<uint64_t, uint64_t>, uint_fast8_t
 
 std::shared_mutex lock;
 
-static constexpr const std::array<bool, 2> next_player{ 1, 0 };
+static constexpr const std::array<uint_fast8_t, 2> next_player{ 1, 0 };
 
 void print_vector_pair(const std::vector<std::pair<uint_fast8_t, uint_fast8_t>>& v)
 {
@@ -27,7 +27,7 @@ void print_vector_pair(const std::vector<std::pair<uint_fast8_t, uint_fast8_t>>&
 	}
 }
 
-uint_fast8_t c4_minimax(const board& prev_board, const bool first_player, const bool out)
+uint_fast8_t c4_minimax(const board& prev_board, const uint_fast8_t first_player, const bool out)
 {
 	const auto moves = prev_board.get_moves();
 	std::vector<std::unique_ptr<std::thread>> threads{};
@@ -58,7 +58,7 @@ uint_fast8_t c4_minimax(const board& prev_board, const bool first_player, const 
 
 }
 
-void minimax_interface(const board& board, const bool player, const uint_fast8_t move, const uint_fast8_t depth, const uint_fast8_t i,
+void minimax_interface(const board& board, const uint_fast8_t player, const uint_fast8_t move, const uint_fast8_t depth, const uint_fast8_t i,
 	std::vector<std::pair<uint_fast8_t, uint_fast8_t>>& main_w_and_m)
 {
 	main_w_and_m[i] = { minimax(board, 0, player, move, depth) , move };
@@ -72,7 +72,7 @@ uint_fast8_t insert_and_return(const std::pair<uint64_t,uint64_t> num_cur_board,
 	return weight;
 }
 
-uint_fast8_t minimax(const board& prev_board, const bool max, const bool player, const uint_fast8_t move, const uint_fast8_t depth, uint_fast8_t alpha, uint_fast8_t beta)
+uint_fast8_t minimax(const board& prev_board, const bool max, const uint_fast8_t player, const uint_fast8_t move, const uint_fast8_t depth, uint_fast8_t alpha, uint_fast8_t beta)
   {
 	++count;
 	const board current_board(prev_board, move, player);
@@ -171,8 +171,7 @@ uint_fast8_t ai_play_ai(const bool out) //returns 0 if draw, 1 if player one won
 
 	//Random::init();
 
-	std::array<bool, 2> next_player{ 1,0 };
-	bool player = 0;
+	uint_fast8_t player = 0;
 
 	while (1)
 	{
@@ -223,8 +222,7 @@ void i_play_ai(const bool ai_first)
 
 	//Random::init();
 
-	std::array<bool, 2> next_player{ 1,0 };
-	bool player = ai_first;
+	uint_fast8_t player = ai_first;
 
 	while (1)
 	{

@@ -14,7 +14,7 @@ static thread_local phmap::parallel_flat_hash_map<std::pair<uint64_t, uint64_t>,
 
 static uint64_t np_count = 0;
 
-static constexpr const std::array<bool, 2> next_player{ 1, 0 };
+static constexpr const std::array<uint_fast8_t, 2> next_player{ 1, 0 };
 
 inline void np_print_vector_pair(const std::vector<std::pair<uint_fast8_t, uint_fast8_t>>& v)
 {
@@ -25,8 +25,8 @@ inline void np_print_vector_pair(const std::vector<std::pair<uint_fast8_t, uint_
 	std::cout << "\n";
 }
 
-uint_fast8_t np_c4_minimax(const board& prev_board, const _c4_brain::c4_brain* brain, const bool first_player,
-	const uint_fast8_t depth, const bool chain_games, const bool chain_player, const bool print)
+uint_fast8_t np_c4_minimax(const board& prev_board, const _c4_brain::c4_brain* brain, const uint_fast8_t first_player,
+	const uint_fast8_t depth, const bool chain_games, const uint_fast8_t chain_player, const bool print)
 {
 	if ((first_player == chain_player) and chain_games) {
 		const auto it = np_seen_boards.find(prev_board.to_num());
@@ -74,7 +74,7 @@ inline uint_fast8_t np_insert_and_return(const std::pair<uint64_t, uint64_t> num
 	return weight;
 }
 
-uint_fast8_t np_minimax(const board& prev_board, const bool max, const bool player, const uint_fast8_t move,
+uint_fast8_t np_minimax(const board& prev_board, const bool max, const uint_fast8_t player, const uint_fast8_t move,
 	const uint_fast8_t depth, const _c4_brain::c4_brain* brain, uint_fast8_t alpha, uint_fast8_t beta)
 {
 	++np_count;
@@ -142,7 +142,7 @@ uint_fast8_t np_minimax(const board& prev_board, const bool max, const bool play
 }
 
 int_fast8_t np_ai_play_ai(const _c4_brain::c4_brain* brain1, const _c4_brain::c4_brain* brain2,
-	uint_fast8_t depth1, uint_fast8_t depth2, const bool chain_games, const bool chain_player, bool print)
+	uint_fast8_t depth1, uint_fast8_t depth2, const bool chain_games, const uint_fast8_t chain_player, bool print)
 {
 	if (print) {
 		stopwatch global;
@@ -175,8 +175,7 @@ int_fast8_t np_ai_play_ai(const _c4_brain::c4_brain* brain1, const _c4_brain::c4
 
 	//Random::init();
 
-	std::array<bool, 2> next_player{ 1,0 };
-	bool player = 0;
+	uint_fast8_t player = 0;
 
 	const _c4_brain::c4_brain* p_brain;
 	uint_fast8_t depth;
@@ -244,8 +243,7 @@ int_fast8_t np_i_play_ai(const _c4_brain::c4_brain* brain, uint_fast8_t depth, b
 
 	//Random::init();
 
-	std::array<bool, 2> next_player{ 1,0 };
-	bool player = 0;
+	uint_fast8_t player = 0;
 
 	while (1)
 	{

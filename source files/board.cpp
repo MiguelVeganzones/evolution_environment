@@ -9,7 +9,7 @@
 static const uint64_t b_const::mask = (const uint64_t)pow(2, sx * sy) - 1;
 using namespace b_const;
 
-const bool board::check_move(const  uint_fast8_t move, const bool player) const
+const bool board::check_move(const  uint_fast8_t move, const uint_fast8_t player) const
 {
 	const uint_fast8_t n = sn - 1; //fichas adyacentes necesarias
 	const uint_fast8_t x = move % sx;
@@ -91,7 +91,7 @@ const std::vector<uint_fast8_t> board::get_moves() const
 		{
 			position = j * sx + i;
 			//std::cout << (int)i << " " << int(ii) << " " << (int)state[0][position] << " " << (int)state[1][position] << std::endl;
-			if (!(state[0][position] | state[1][position]))
+			if (!state[0][position] and !state[1][position])
 			{
 				possible_moves.push_back(position);
 				break;
@@ -109,7 +109,8 @@ const std::array<std::bitset<size>, players> from_num(const std::pair<uint64_t, 
 
 const std::pair<uint64_t, uint64_t> board::to_num() const
 {
-	//even tho the states are std::bitset<42>, they are stored as 8 bytes
+	//even tho the states are std::bitset<42>, they are stored as one word in x64 (two words in x86) (64 bits)
+	//the unused bits are the higher ones
 	return { (*(uint64_t*)&state[0] & mask) , (*(uint64_t*)&state[1] & mask) }; //evil bit hacking
 }
 
