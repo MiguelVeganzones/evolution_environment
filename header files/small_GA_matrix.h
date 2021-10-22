@@ -129,8 +129,7 @@ namespace _matrix {
 		inline void mutate(T(*randnormal)(float, float), const float p, const float avg = 0, const float stddev = 1) {
 			for (int i = 0; i < m; ++i)
 				for (int j = 0; j < n; ++j)
-					if (random::randfloat() < p)
-						data[i][j] += randnormal(avg, stddev);
+					data[i][j] += randnormal(avg, stddev) * (random::randfloat() < p);
 		}
 
 		//read only access to the data
@@ -153,7 +152,7 @@ namespace _matrix {
 			for (int j = 0; j < m; ++j) {
 				ret_data[j] = data[j] * other[j];
 			}
-			return std::move(matrix<T>(ret_data));
+			return ret_data;
 		}
 
 		inline matrix<T> operator *(const T& p) const {//elementwise multiplication
@@ -163,7 +162,7 @@ namespace _matrix {
 			for (int j = 0; j < m; ++j) {
 				ret_data[j] = data[j] * p;
 			}
-			return std::move(matrix<T>(ret_data));
+			return ret_data;
 		}
 
 		template<class T>
@@ -214,9 +213,16 @@ namespace _matrix {
 		for (int i = 0; i < m; ++i) {
 			mat(i, i) = 1;
 		}
-		return std::move(mat);
+		return mat;
 	}
 
+	/// <summary>
+	/// Creates an identity matrix with swaped rows and columns
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	/// <param name="m"></param>
+	/// <param name="v"></param>
+	/// <returns></returns>
 	template<class T>
 	inline matrix<T> custom_eye(const uint_fast8_t m, const std::vector<uint_fast8_t>& v) {
 		assert(m == v.size());
@@ -224,7 +230,7 @@ namespace _matrix {
 		for (int i = 0; i < m; ++i) {
 			mat(i, v[i]) = 1;
 		}
-		return std::move(mat);
+		return mat;
 	}
 
 	template<class T>
@@ -238,7 +244,7 @@ namespace _matrix {
 			ret_data[j] = (mat1[j] + mat2[j]) / 2;
 		}
 
-		return std::move(matrix<T>(ret_data));
+		return ret_data;
 	}
 
 	//crossover two matrices swapping rows
@@ -252,7 +258,7 @@ namespace _matrix {
 		const matrix<T> ret1(mat1[{0, a}], mat2[{a, m}]);
 		const matrix<T> ret2(mat2[{0, a}], mat1[{a, m}]);
 
-		return std::move(std::pair<matrix<T>, matrix<T>>(ret1, ret2));
+		return std::make_pair(ret1, ret2);
 	}
 
 	template<class T>
@@ -290,7 +296,7 @@ namespace _matrix {
 			}
 		}
 
-		return std::move(std::pair<matrix<T>, matrix<T>>(matrix<T>(data1), matrix<T>(data2)));
+		return std::make_pair(data1, data2);
 	}
 
 	template<class T>
@@ -303,7 +309,7 @@ namespace _matrix {
 				_data[j][i] = mat(i, j);
 			}
 		}
-		return std::move(matrix<T>(_data));
+		return _data;
 	}
 
 	//returns adjunct matrix of mat referred to element ( y , x ) 
@@ -322,7 +328,7 @@ namespace _matrix {
 			}
 			++_j;
 		}
-		return matrix<T>(ret_data);
+		return ret_data;
 	}
 
 	//matrix-matrix dot product implementation
@@ -340,7 +346,7 @@ namespace _matrix {
 				ret_data[j][i] = std::inner_product(std::begin(mat1[j]), std::end(mat1[j]), std::begin(mat2_t[i]), T(0));
 			}
 		}
-		return std::move(matrix<T>(ret_data));
+		return ret_data;
 	}
 
 	//to be implemented
@@ -366,7 +372,7 @@ namespace _matrix {
 		for (int i = 0; i < _n; ++i) {
 			ret_data[i] = std::inner_product(std::begin(v), std::end(v), std::begin(mat_t[i]), T(0));
 		}
-		return std::move(ret_data);
+		return ret_data;
 	}
 
 	//matrix-vector dot product implementation
@@ -382,7 +388,7 @@ namespace _matrix {
 		for (int j = 0; j < _m; ++j) {
 			ret_data[j] = std::inner_product(std::begin(mat[j]), std::end(mat[j]), std::begin(v), T(0));
 		}
-		return std::move(ret_data);
+		return ret_data;
 	}
 
 	template<class T>
@@ -490,7 +496,7 @@ namespace _matrix {
 			}
 			if (out[ri[p]][p] == 0) {
 				// The matrix is singular. //or not inversible by this methode untill fixed (no permutations)
-				return std::tuple<bool, double, matrix<T>, std::vector<uint_fast8_t>>(false, NAN, std::move(out), std::move(ri));
+				return std::tuple<bool, double, matrix<T>, std::vector<uint_fast8_t>>(false, NAN, out, ri);
 			}
 			// Multiply the diagonal elements.
 			det *= out[ri[p]][p];
@@ -514,8 +520,8 @@ namespace _matrix {
 			}
 		}
 
-		return std::move(std::tuple<bool, double, matrix<T>, std::vector<uint_fast8_t>>
-			(det != 0.0, det != 0.0 ? det : NAN, std::move(out), std::move(_ri)));
+		return std::tuple<bool, double, matrix<T>, std::vector<uint_fast8_t>>
+			(det != 0.0, det != 0.0 ? det : NAN, out, _ri);
 	}
 
 	template<class T>
@@ -532,7 +538,7 @@ namespace _matrix {
 
 		if (!inv) {
 			std::cout << "Singular matrix\n";
-			return std::move(matrix<T>(m, n, T(NAN))); //this would not work for custom T's
+			return matrix<T>(m, n, T(NAN)); //this would not work for custom T's
 		}
 
 		int i, j;
@@ -571,7 +577,7 @@ namespace _matrix {
 			inv_T_data[i] = LU_matrix_vector_solve(L, U, Pi);
 		}
 
-		return std::move(transpose(matrix<T>(inv_T_data)));
+		return transpose(inv_T_data);
 	}
 
 	template<class T>

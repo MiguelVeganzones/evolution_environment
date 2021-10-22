@@ -155,7 +155,7 @@ const _c4_brain::c4_brain _c4_evo_env::simulate_evolution_helper(std::vector<_c4
 				e->print_stats();
 			}
 			std::cout << "Best winrate in the last epoch: " << weights[ret_i] << "\n";
-			return std::move(brains[gi[1]][ret_i]);
+			return brains[gi[1]][ret_i];
 		}
 
 		_parents = selection_operator(gen[gi[1]], weights, alpha(i, epochs), parents);
