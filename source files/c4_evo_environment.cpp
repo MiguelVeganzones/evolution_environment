@@ -90,6 +90,7 @@ const _c4_brain::c4_brain _c4_evo_env::simulate_evolution_helper(std::vector<_c4
 	const uint_fast8_t top_n, const float mutation_p, const uint_fast8_t control_group_size)
 {
 	const uint_fast8_t pop_size = _brains.size();
+
 	std::vector<_c4_brain::c4_brain*> _b;
 	_b.reserve(pop_size);
 	for (int i = 0; i < pop_size; ++i) {
