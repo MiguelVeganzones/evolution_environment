@@ -481,10 +481,3 @@ int main16() {
 
 	return EXIT_SUCCESS;
 }
-
-#include "c4minimax.h"
-
-int main() {
-	stopwatch s;
-	ai_play_ai(1);
-}
