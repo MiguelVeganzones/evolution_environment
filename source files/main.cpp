@@ -425,7 +425,7 @@ int main13() {
 	return EXIT_SUCCESS;
 }
 
-int main() {
+int main14() {
 	stopwatch s;
 	random::init();
 
@@ -480,4 +480,11 @@ int main16() {
 	np_ai_play_ai(&b, &b, 5, 5, 0, 0, 1);
 
 	return EXIT_SUCCESS;
+}
+
+#include "c4minimax.h"
+
+int main() {
+	stopwatch s;
+	ai_play_ai(1);
 }

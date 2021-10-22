@@ -8,11 +8,12 @@
 #include "Random.h"
 #include "stopwatch.h"
 #include <algorithm>
+#include <execution>
 
 //static std::map<std::pair<uint64_t, uint64_t>, uint_fast8_t> computed_boards;
 
 static uint64_t count = 0;
-static constexpr uint_fast8_t sdepth = 10; //calls to minimax  <= sx + sx**2 + .... + sx**sdepth (creo)
+static constexpr uint_fast8_t sdepth = 11; //calls to minimax  <= sx + sx**2 + .... + sx**sdepth (creo)
 static phmap::parallel_flat_hash_map<std::pair<uint64_t, uint64_t>, uint_fast8_t> computed_boards;
 
 std::shared_mutex lock;
@@ -33,18 +34,10 @@ uint_fast8_t c4_minimax(const board& prev_board, const uint_fast8_t first_player
 	std::vector<std::unique_ptr<std::thread>> threads{};
 	std::vector<std::pair<uint_fast8_t, uint_fast8_t>> main_w_and_m(moves.size());
 
-	if (moves.size() == 0) { return 255; }
-
-	uint_fast8_t i = 0;
-	for (auto move : moves) {
-		threads.push_back(std::make_unique<std::thread>(std::thread
-			(minimax_interface, prev_board, first_player, move, sdepth-1, i++, std::ref(main_w_and_m))));
-		//minimax_interface( prev_board, first_player, move, 1, i++, std::ref(main_w_and_m));
-	}
-
-	for (auto& t : threads) {
-		t->join();
-	}
+	uint8_t i{};
+	std::for_each(std::execution::par, std::begin(moves), std::end(moves), [&](uint8_t move) {
+		minimax_interface(prev_board, first_player, move, sdepth - 1, i++, std::ref(main_w_and_m));
+		});
 
 	if (out) { std::cout << " minimax calls aprox: " << count << "\n" << " Unique boards stored: " << computed_boards.size() << "\n"; }
 
