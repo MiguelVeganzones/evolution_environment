@@ -47,15 +47,13 @@ layer::layer(const uint_fast8_t _y, const uint_fast8_t _x, const uint_fast8_t _m
 }
 
 _ga_nn::layer::layer(const uint_fast8_t _y, const uint_fast8_t _x, const std::vector<node>& _nodes) :
-	nodes{ _nodes }, x{ _x }, y{ _y }{
-	m = _nodes[0].get_m();
-	n = _nodes[0].get_n();
+	nodes{ _nodes }, x{ _x }, y{ _y }, m{ _nodes[0].get_m() }, n{ _nodes[0].get_n() }{
+
 }
 
 _ga_nn::layer::layer(const uint_fast8_t _y, const uint_fast8_t _x, std::vector<node>&& _nodes) :
-	nodes{ std::move(_nodes) }, x{ _x }, y{ _y }{
-	m = _nodes[0].get_m();
-	n = _nodes[0].get_n();
+	m{ _nodes[0].get_m() }, n{ _nodes[0].get_n() }, nodes{ std::move(_nodes) }, x{ _x }, y{ _y }{
+
 }
 
 void _ga_nn::layer::mutate(float p, float avg, float stddev){
@@ -84,7 +82,7 @@ _ga_nn::in_layer::in_layer(const uint_fast8_t _y, const uint_fast8_t _x, const u
 
 _ga_nn::in_layer::in_layer(const uint_fast8_t _y, const uint_fast8_t _x, const uint_fast8_t _next_y,
 	const uint_fast8_t _next_x, std::vector<node>&& _nodes) :
-layer(_y, _x, std::move(_nodes)), next_y{ _next_y }, next_x{ _next_x }{
+next_y{ _next_y }, next_x{ _next_x }, layer(_y, _x, std::move(_nodes)) {
 
 }
 
@@ -120,7 +118,7 @@ _ga_nn::hidden_layer::hidden_layer(const uint_fast8_t _prev_y, const uint_fast8_
 
 _ga_nn::hidden_layer::hidden_layer(const uint_fast8_t _prev_y, const uint_fast8_t _prev_x, const uint_fast8_t _y, const uint_fast8_t _x,
 	const uint_fast8_t _next_y, const uint_fast8_t _next_x, std::vector<node>&& _nodes) :
-	layer(_y, _x, std::move(_nodes)), prev_x{ _prev_x }, prev_y{ _prev_y }, next_x{ _next_x }, next_y{ _next_y }{
+	prev_x{ _prev_x }, prev_y{ _prev_y }, next_x{ _next_x }, next_y{ _next_y }, layer(_y, _x, std::move(_nodes)) {
 
 }
 
@@ -169,7 +167,7 @@ _ga_nn::out_layer::out_layer(const uint_fast8_t _prev_y, const uint_fast8_t _pre
 
 _ga_nn::out_layer::out_layer(const uint_fast8_t _prev_y, const uint_fast8_t _prev_x, const uint_fast8_t _y,
 	const uint_fast8_t _x, std::vector<node>&& _nodes) :
-	layer(_y, _x, std::move(_nodes)), prev_x{ _prev_x }, prev_y{ _prev_y }{
+	prev_x{ _prev_x }, prev_y{ _prev_y }, layer(_y, _x, std::move(_nodes)) {
 
 }
 
@@ -262,7 +260,6 @@ _ga_nn::neural_net::neural_net(const std::vector<uint_fast8_t>& v, const std::ve
 _ga_nn::neural_net::neural_net(const std::vector<uint_fast8_t>& v, std::vector<node>&& _nodes)
 {
 	assert(v.size() % 2 == 0 && v.size() >= 6);
-	std::cout << 'a';
 	shape = v;
 
 	const uint_fast8_t s = v.size();
@@ -380,7 +377,7 @@ const std::pair<neural_net, neural_net> _ga_nn::crossover(const neural_net& net1
 	const std::vector<_ga_nn::node>& head_nodes_v2 = net2.get_head()->get();
 
 	for (i = 0; i < x * y; ++i) {
-		ret_nodes.push_back(_matrix::x_crossover(head_nodes_v1[i].get(), head_nodes_v2[i].get()));
+		ret_nodes.push_back(std::move(_matrix::x_crossover(head_nodes_v1[i].get(), head_nodes_v2[i].get())));
 	}
 
 	//hidden
@@ -392,7 +389,7 @@ const std::pair<neural_net, neural_net> _ga_nn::crossover(const neural_net& net1
 		y = hidden_layers1[j]->get_y();
 
 		for (i = 0; i < x * y; ++i) {
-			ret_nodes.push_back(_matrix::x_crossover(hidden_layers1[j]->get()[i].get(), hidden_layers2[j]->get()[i].get()));
+			ret_nodes.push_back(std::move(_matrix::x_crossover(hidden_layers1[j]->get()[i].get(), hidden_layers2[j]->get()[i].get())));
 		}
 	}
 
@@ -404,7 +401,7 @@ const std::pair<neural_net, neural_net> _ga_nn::crossover(const neural_net& net1
 	const std::vector<_ga_nn::node>& tail_nodes_v2 = net2.get_tail()->get();
 
 	for (i = 0; i < x * y; ++i) {
-		ret_nodes.push_back(_matrix::x_crossover(tail_nodes_v1[i].get(), tail_nodes_v2[i].get()));
+		ret_nodes.push_back(std::move(_matrix::x_crossover(tail_nodes_v1[i].get(), tail_nodes_v2[i].get())));
 	}
 
 	std::vector<node> new_nodes1, new_nodes2;

@@ -41,12 +41,12 @@ namespace _c4_evo_env {
 		const uint_fast8_t cur_depth = 2, const uint_fast8_t prev_depth = 3, const uint_fast8_t control_epochs = 10,
 		const uint_fast8_t top_n = 1, const float mutation_p = 0.2, const uint_fast8_t control_group_size = 10);
 
-	const _c4_brain::c4_brain simulate_evolution(std::vector<_c4_brain::c4_brain>& _brains, const uint_fast8_t parents,
+	const _c4_brain::c4_brain simulate_evolution(std::vector<_c4_brain::c4_brain>&& _brains, const uint_fast8_t parents,
 		const uint_fast8_t epochs,
 		const uint_fast8_t cur_depth = 2, const uint_fast8_t prev_depth = 3, const uint_fast8_t control_epochs = 10,
 		const uint_fast8_t top_n = 1, const float mutation_p = 0.2, const uint_fast8_t control_group_size = 10);
 
-	const _c4_brain::c4_brain simulate_evolution_helper(std::vector<_c4_brain::c4_brain>& _brains, const uint_fast8_t parents, const uint_fast8_t epochs,
+	const _c4_brain::c4_brain simulate_evolution_helper(std::vector<_c4_brain::c4_brain>&& _brains, const uint_fast8_t parents, const uint_fast8_t epochs,
 		const std::vector<uint_fast8_t>& _shape, const uint_fast8_t cur_depth, const uint_fast8_t prev_depth, const uint_fast8_t control_epochs,
 		const uint_fast8_t top_n, const float mutation_p, const uint_fast8_t control_group_size);
 

@@ -71,20 +71,20 @@ const _c4_brain::c4_brain _c4_evo_env::simulate_evolution(const uint_fast8_t pop
 		brains.emplace_back(_shape);
 	}
 
-	return simulate_evolution_helper(brains, parents, epochs, _shape, cur_depth, prev_depth,
+	return simulate_evolution_helper(std::move(brains), parents, epochs, _shape, cur_depth, prev_depth,
 		control_epochs, top_n, mutation_p, control_group_size);
 
 }
 
-const _c4_brain::c4_brain _c4_evo_env::simulate_evolution(std::vector<_c4_brain::c4_brain>& _brains, const uint_fast8_t parents,
+const _c4_brain::c4_brain _c4_evo_env::simulate_evolution(std::vector<_c4_brain::c4_brain>&& _brains, const uint_fast8_t parents,
 	const uint_fast8_t epochs, const uint_fast8_t cur_depth, const uint_fast8_t prev_depth,
 	const uint_fast8_t control_epochs, const uint_fast8_t top_n, const float mutation_p, const uint_fast8_t control_group_size)
 {
-	return simulate_evolution_helper(_brains, parents, epochs, _brains[0].get_shape(),
+	return simulate_evolution_helper(std::move(_brains), parents, epochs, _brains[0].get_shape(),
 		cur_depth, prev_depth, control_epochs, top_n, mutation_p, control_group_size);
 }
 
-const _c4_brain::c4_brain _c4_evo_env::simulate_evolution_helper(std::vector<_c4_brain::c4_brain>& _brains, const uint_fast8_t parents, 
+const _c4_brain::c4_brain _c4_evo_env::simulate_evolution_helper(std::vector<_c4_brain::c4_brain>&& _brains, const uint_fast8_t parents, 
 	const uint_fast8_t epochs, const std::vector<uint_fast8_t>& _shape, const uint_fast8_t cur_depth, 
 	const uint_fast8_t prev_depth, const uint_fast8_t control_epochs,
 	const uint_fast8_t top_n, const float mutation_p, const uint_fast8_t control_group_size)
@@ -109,7 +109,9 @@ const _c4_brain::c4_brain _c4_evo_env::simulate_evolution_helper(std::vector<_c4
 	std::array<std::vector<_c4_brain::c4_brain>, 2> brains;
 
 	brains[gi[0]].reserve(pop_size);
-	brains[gi[1]] = std::move(_brains);
+	
+	brains[gi[1]] = std::vector<_c4_brain::c4_brain>(std::make_move_iterator(_brains.begin()),
+													 std::make_move_iterator(_brains.end()));
 
 	std::array<std::vector<_c4_brain::c4_brain*>, 2> gen; //gen[bi[0]] is prev, gen[bi[1]] is current
 
@@ -227,18 +229,18 @@ std::vector<_c4_brain::c4_brain> _c4_evo_env::breed_new_gen(const std::vector<_c
 
 		do {
 			b = random::randint(0, np - 1);
-		} while (a == b);
+		} while (a == b); //unefficient but will affect performance minimally
 
-		const std::pair<_c4_brain::c4_brain, _c4_brain::c4_brain> b_pair = _c4_brain::crossover(parents[a], parents[b]);
-		ret.push_back(b_pair.first);
-		ret.push_back(b_pair.second);
+		std::pair<_c4_brain::c4_brain, _c4_brain::c4_brain> b_pair = _c4_brain::crossover(parents[a], parents[b]);
+		ret.push_back(std::move(b_pair.first));
+		ret.push_back(std::move(b_pair.second));
 	}
 
 	if(mito){
 		a = random::randint(0, np - 1);
 		_ga_nn::neural_net temp(*parents[a]->get_net().get());
 		temp.mutate();
-		ret.emplace_back(temp);
+		ret.emplace_back(std::move(temp));
 	}
 
 	for (i = top_n; i < pop_size; ++i) {

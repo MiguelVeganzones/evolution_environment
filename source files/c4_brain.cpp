@@ -24,7 +24,7 @@ _c4_brain::c4_brain::c4_brain(const c4_brain& brain) : shape{ brain.get_shape() 
 	p_net = std::make_unique<_ga_nn::neural_net>(*brain.get_net());
 }
 
-_c4_brain::c4_brain::c4_brain(c4_brain&& other) : shape(std::move(other.shape)), p_net(std::move(other.p_net)) {
+_c4_brain::c4_brain::c4_brain(c4_brain&& other) noexcept : shape(std::move(other.shape)), p_net(std::move(other.p_net)) {
 
 }
 
@@ -179,13 +179,13 @@ _c4_brain::c4_brain _c4_brain::read(const char* const file_name)
 const std::pair<_c4_brain::c4_brain, _c4_brain::c4_brain> _c4_brain::crossover(const c4_brain& brain1, const c4_brain& brain2)
 {
 	std::pair<_ga_nn::neural_net, _ga_nn::neural_net> ret_nets = _ga_nn::crossover(*brain1.get_net().get(), *brain2.get_net().get());
-	return std::move(std::make_pair<c4_brain, c4_brain>(ret_nets.first, ret_nets.second));
+	return std::make_pair<c4_brain, c4_brain>(std::move(ret_nets.first), std::move(ret_nets.second));
 }
 
-const std::pair<_c4_brain::c4_brain, _c4_brain::c4_brain> _c4_brain::crossover( c4_brain* brain1, c4_brain* brain2)
+const std::pair<_c4_brain::c4_brain, _c4_brain::c4_brain> _c4_brain::crossover(const c4_brain* brain1, const c4_brain* brain2)
 {
 	std::pair<_ga_nn::neural_net, _ga_nn::neural_net> ret_nets = _ga_nn::crossover(*brain1->get_net().get(), *brain2->get_net().get());
-	return std::move(std::make_pair<c4_brain, c4_brain>(ret_nets.first, ret_nets.second));
+	return std::make_pair<c4_brain, c4_brain>(std::move(ret_nets.first), std::move(ret_nets.second));
 }
 
 const _matrix::matrix<double> _c4_brain::population_variability(const std::vector<c4_brain*>& brains)

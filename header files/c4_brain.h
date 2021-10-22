@@ -20,7 +20,7 @@ namespace _c4_brain {
 		c4_brain(const std::vector<uint_fast8_t>& _shape);
 		c4_brain(const _ga_nn::neural_net& nn);
 		c4_brain(const c4_brain& brain);
-		c4_brain(c4_brain&& other);
+		c4_brain(c4_brain&& other) noexcept;
 
 		uint_fast8_t weigh(const board& current_board, const bool player) const;
 		//inline static uint_fast8_t s_weigh(const _c4_brain::c4_brain& b, const board& _board) { return b.weigh(_board); }
@@ -48,7 +48,7 @@ namespace _c4_brain {
 	};
 
 	const std::pair<c4_brain, c4_brain> crossover(const c4_brain& brain1, const c4_brain& brain2);
-	const std::pair<c4_brain, c4_brain> crossover(c4_brain* brain1, c4_brain* brain2);
+	const std::pair<c4_brain, c4_brain> crossover(const c4_brain* brain1, const c4_brain* brain2);
 
 	const _matrix::matrix<double> population_variability(const std::vector<c4_brain*>& brains);
 	const _matrix::matrix<double> population_variability(const std::vector<std::reference_wrapper<c4_brain>>& brains);

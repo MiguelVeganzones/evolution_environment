@@ -274,7 +274,7 @@ namespace _matrix {
 	}
 
 	template<class T>
-	inline const std::pair<matrix<T>, matrix<T>> x_crossover(const matrix<T>& mat1, const matrix<T>& mat2) {
+	inline std::pair<matrix<T>, matrix<T>> x_crossover(const matrix<T>& mat1, const matrix<T>& mat2) {
 		assert(mat1.get_m() == mat2.get_m() && mat1.get_n() == mat2.get_n());
 
 		const uint_fast8_t m = mat1.get_m();
