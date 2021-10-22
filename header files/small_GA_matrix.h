@@ -43,6 +43,9 @@ namespace _matrix {
 			}
 		}
 
+		inline matrix<T>(const matrix<T>&) = default;
+		inline matrix<T>(matrix<T>&&) = default;
+
 		inline matrix(T(*foo)(), const float offset = 0, const uint_fast8_t _m = 1, const uint_fast8_t _n = 1) : m{ _m }, n{ _n } {
 			assert(m != 0 && n != 0);
 			data.resize(m);
@@ -78,6 +81,15 @@ namespace _matrix {
 			for (int i = m1; i < m2 + m1; ++i) {
 				data[i] = _data2[i];
 			}
+		}
+
+		inline matrix<T>& operator=(const matrix<T>& other) {
+			if (this == &other)
+				return *this;
+			m = other.get_m();
+			n = other.get_n();
+			data = other.get();
+			return *this;
 		}
 
 		//read-write 2d index operator

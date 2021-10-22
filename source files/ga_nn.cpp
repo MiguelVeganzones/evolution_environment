@@ -1,8 +1,10 @@
+#pragma once
 #include "ga_nn.h"
 #include <vector>
 #include <assert.h>
 #include "board.h"
 #include <fstream>
+#include <iterator>
 
 #ifndef NDEBUG
 #define NDEBUG
@@ -50,6 +52,12 @@ _ga_nn::layer::layer(const uint_fast8_t _y, const uint_fast8_t _x, const std::ve
 	n = _nodes[0].get_n();
 }
 
+_ga_nn::layer::layer(const uint_fast8_t _y, const uint_fast8_t _x, std::vector<node>&& _nodes) :
+	nodes{ std::move(_nodes) }, x{ _x }, y{ _y }{
+	m = _nodes[0].get_m();
+	n = _nodes[0].get_n();
+}
+
 void _ga_nn::layer::mutate(float p, float avg, float stddev){
 	for (auto& node : nodes) {
 		node.mutate(p, avg, stddev);
@@ -68,8 +76,15 @@ _ga_nn::in_layer::in_layer(const uint_fast8_t _y, const uint_fast8_t _x, const u
 }
 
 //constructor from vector of nodes
-_ga_nn::in_layer::in_layer(const uint_fast8_t _y, const uint_fast8_t _x, const uint_fast8_t _next_y, const uint_fast8_t _next_x, const std::vector<node>& _nodes) : 
+_ga_nn::in_layer::in_layer(const uint_fast8_t _y, const uint_fast8_t _x, const uint_fast8_t _next_y,
+	const uint_fast8_t _next_x, const std::vector<node>& _nodes) : 
 	layer(_y, _x, _nodes), next_y{_next_y}, next_x{_next_x}{
+
+}
+
+_ga_nn::in_layer::in_layer(const uint_fast8_t _y, const uint_fast8_t _x, const uint_fast8_t _next_y,
+	const uint_fast8_t _next_x, std::vector<node>&& _nodes) :
+layer(_y, _x, std::move(_nodes)), next_y{ _next_y }, next_x{ _next_x }{
 
 }
 
@@ -100,6 +115,12 @@ _ga_nn::hidden_layer::hidden_layer(const uint_fast8_t _prev_y, const uint_fast8_
 _ga_nn::hidden_layer::hidden_layer(const uint_fast8_t _prev_y, const uint_fast8_t _prev_x, const uint_fast8_t _y, const uint_fast8_t _x,
 	const uint_fast8_t _next_y, const uint_fast8_t _next_x, const std::vector<node>& _nodes) : 
 	layer(_y, _x, _nodes), prev_x{ _prev_x }, prev_y{ _prev_y }, next_x{ _next_x }, next_y{ _next_y }{
+
+}
+
+_ga_nn::hidden_layer::hidden_layer(const uint_fast8_t _prev_y, const uint_fast8_t _prev_x, const uint_fast8_t _y, const uint_fast8_t _x,
+	const uint_fast8_t _next_y, const uint_fast8_t _next_x, std::vector<node>&& _nodes) :
+	layer(_y, _x, std::move(_nodes)), prev_x{ _prev_x }, prev_y{ _prev_y }, next_x{ _next_x }, next_y{ _next_y }{
 
 }
 
@@ -140,8 +161,15 @@ _ga_nn::out_layer::out_layer(const uint_fast8_t _prev_y, const uint_fast8_t _pre
 
 }
 
-_ga_nn::out_layer::out_layer(const uint_fast8_t _prev_y, const uint_fast8_t _prev_x, const uint_fast8_t _y, const uint_fast8_t _x, const std::vector<node>& _nodes) :
+_ga_nn::out_layer::out_layer(const uint_fast8_t _prev_y, const uint_fast8_t _prev_x, const uint_fast8_t _y,
+	const uint_fast8_t _x, const std::vector<node>& _nodes) :
 	layer(_y, _x, _nodes), prev_x{ _prev_x }, prev_y{ _prev_y }{
+
+}
+
+_ga_nn::out_layer::out_layer(const uint_fast8_t _prev_y, const uint_fast8_t _prev_x, const uint_fast8_t _y,
+	const uint_fast8_t _x, std::vector<node>&& _nodes) :
+	layer(_y, _x, std::move(_nodes)), prev_x{ _prev_x }, prev_y{ _prev_y }{
 
 }
 
@@ -164,7 +192,7 @@ std::valarray<float> _ga_nn::out_layer::forward_pass(const std::vector<_matrix::
 		ret[k] = nodes[k].forward_pass(v)[0]; //only one output per node
 	}
 
-	return std::move(foo(ret));
+	return foo(ret);
 }
 
 _ga_nn::neural_net::neural_net(const std::vector<uint_fast8_t>& v) {
@@ -226,6 +254,42 @@ _ga_nn::neural_net::neural_net(const std::vector<uint_fast8_t>& v, const std::ve
 	p_tail = std::make_unique<_ga_nn::out_layer>(_ga_nn::out_layer(v[i - 2], v[i - 1], v[i], v[i + 1], tail_nodes));
 }
 
+/// <summary>
+///
+/// </summary>
+/// <param name="v"></param>
+/// <param name="_nodes"></param>
+_ga_nn::neural_net::neural_net(const std::vector<uint_fast8_t>& v, std::vector<node>&& _nodes)
+{
+	assert(v.size() % 2 == 0 && v.size() >= 6);
+
+	shape = v;
+
+	const uint_fast8_t s = v.size();
+	p_hidden.resize(int(s / 2) - 2);
+
+	uint_fast8_t i = 0;
+
+	auto start = std::const_iterator(_nodes.begin());
+	auto end = std::make_iterator(start + v[i] * v[i + 1]);
+
+	p_head = std::make_unique<_ga_nn::in_layer>(_ga_nn::in_layer(v[i], v[i + 1], v[i + 2], v[i + 3], std::vector<node>(start, end)));
+
+	for (int j = 0, i = 2; i < s - 2; i += 2, ++j) {
+
+		start = end;
+		end += v[i] * v[i + 1];
+
+		p_hidden[j] = std::make_unique<_ga_nn::hidden_layer>
+			(_ga_nn::hidden_layer(v[i - 2], v[i - 1], v[i], v[i + 1], v[i + 2], v[i + 3], std::vector<node>(start, end)));
+	}
+
+	i = s - 2;
+	start = end;
+	end += v[i] * v[i + 1];
+	p_tail = std::make_unique<_ga_nn::out_layer>(_ga_nn::out_layer(v[i - 2], v[i - 1], v[i], v[i + 1], std::vector<node>(start, end)));
+}
+
 _ga_nn::neural_net::neural_net(const neural_net& net): shape{net.shape}
 {
 	p_head = std::make_unique<_ga_nn::in_layer>(*net.get_head());
@@ -270,7 +334,7 @@ std::valarray<float> _ga_nn::neural_net::forard_pass(const _matrix::matrix<float
 		//std::cout << "//--------------------------------------------------\n";
 	}
 
-	return std::move(p_tail->forward_pass(_data));
+	return p_tail->forward_pass(_data);
 }
 
 void _ga_nn::neural_net::mutate(float p, float avg, float stddev)
@@ -354,7 +418,7 @@ const std::pair<neural_net, neural_net> _ga_nn::crossover(const neural_net& net1
 		new_nodes2.push_back(it->second);
 	}
 
-	return std::move(std::pair<neural_net, neural_net>(neural_net(_shape, std::move(new_nodes1)), neural_net(_shape, std::move(new_nodes2))));
+	return std::make_pair(neural_net(_shape, std::move(new_nodes1)), neural_net(_shape, std::move(new_nodes2)));
 }
 
 const neural_net _ga_nn::average(const neural_net& net1, const neural_net& net2)
@@ -409,7 +473,7 @@ const neural_net _ga_nn::average(const neural_net& net1, const neural_net& net2)
 		ret_nodes.push_back(_matrix::average(tail_nodes_v1[i].get(), tail_nodes_v2[i].get()));
 	}
 
-	return std::move(neural_net(_shape, std::move(ret_nodes)));
+	return neural_net(_shape, std::move(ret_nodes));
 }
 
 const neural_net _ga_nn::mutation(const neural_net& net)
@@ -464,7 +528,7 @@ const neural_net _ga_nn::mutation(const neural_net& net)
 		ret_nodes.push_back(std::move(tail_nodes[i]));
 	}
 
-	return std::move(neural_net(_shape, std::move(ret_nodes)));
+	return neural_net(_shape, std::move(ret_nodes));
 }
 
 std::ostream& _ga_nn::operator<<(std::ostream& os, const neural_net& nn)

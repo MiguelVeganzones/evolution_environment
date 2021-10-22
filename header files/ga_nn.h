@@ -12,14 +12,18 @@ namespace _ga_nn {
 	
 	class node {
 	private:
-		uint_fast8_t inputs = 0;
-		uint_fast8_t outputs = 0;
+		uint_fast8_t inputs;
+		uint_fast8_t outputs;
 		mutable _matrix::matrix<float> weights;
 
 	public:
-		inline node() = default;
+		inline node() : inputs{}, outputs{}, weights{}{};
 		node(const uint_fast8_t _inputs, const uint_fast8_t _outputs);
 		node(const _matrix::matrix<float>& _weights);
+		node(node&&) = default;
+		node(const node&) = default;
+
+		inline node& operator=(const node&) = default;
 
 		//mutate every weight with a probability of p, according to a normal distribution (by default): Normal(avg, stddev)
 		void mutate(const float p = .5f, const float avg = 0, const float stddev = .2f, float(*randnormal)(float, float) = random::randnormal);
@@ -33,7 +37,7 @@ namespace _ga_nn {
 	
 		//weight set, new weights must be of the same size and shape
 		void set(const _matrix::matrix<float>& new_weights);
-		void store(const char* const file_name) const;
+		//void store(const char* const file_name) const;
 
 		friend bool operator==(const node& n1, const node& n2);
 		friend bool operator!=(const node& n1, const node& n2);
@@ -57,6 +61,7 @@ namespace _ga_nn {
 	public:
 		layer(const uint_fast8_t _y, const uint_fast8_t _x, const uint_fast8_t m, const uint_fast8_t n);
 		layer(const uint_fast8_t _y, const uint_fast8_t _x, const std::vector<node>& _nodes);
+		layer(const uint_fast8_t _y, const uint_fast8_t _x, std::vector<node>&& _nodes);
 
 		inline const std::vector<node>& get() const { return nodes; }
 		inline const uint_fast8_t get_x() const { return x; }
@@ -78,6 +83,7 @@ namespace _ga_nn {
 	public:
 		in_layer(const uint_fast8_t _y, const uint_fast8_t _x, const uint_fast8_t _next_y, const uint_fast8_t _next_x);
 		in_layer(const uint_fast8_t _y, const uint_fast8_t _x, const uint_fast8_t _next_y, const uint_fast8_t _next_x, const std::vector<node>& _nodes);
+		in_layer(const uint_fast8_t _y, const uint_fast8_t _x, const uint_fast8_t _next_y, const uint_fast8_t _next_x, std::vector<node>&& _nodes);
 
 		inline const uint_fast8_t get_next_x() const { return next_x; }
 		inline const uint_fast8_t get_next_y() const { return next_y; }
@@ -98,6 +104,8 @@ namespace _ga_nn {
 			const uint_fast8_t _next_y, const uint_fast8_t _next_x);
 		hidden_layer(const uint_fast8_t _prev_y, const uint_fast8_t _prev_x, const uint_fast8_t _y, const uint_fast8_t _x,
 			const uint_fast8_t _next_y, const uint_fast8_t _next_x, const std::vector<node>& _nodes);
+		hidden_layer(const uint_fast8_t _prev_y, const uint_fast8_t _prev_x, const uint_fast8_t _y, const uint_fast8_t _x,
+			const uint_fast8_t _next_y, const uint_fast8_t _next_x, std::vector<node>&& _nodes);
 
 		inline const uint_fast8_t get_next_x() const { return next_x; }
 		inline const uint_fast8_t get_next_y() const { return next_y; }
@@ -115,8 +123,12 @@ namespace _ga_nn {
 		const uint_fast8_t prev_x, prev_y;
 
 	public:
-		out_layer(const uint_fast8_t _prev_y, const uint_fast8_t _prev_x, const uint_fast8_t _y, const uint_fast8_t _x);
-		out_layer(const uint_fast8_t _prev_y, const uint_fast8_t _prev_x, const uint_fast8_t _y, const uint_fast8_t _x, const std::vector<node>& _nodes);
+		out_layer(const uint_fast8_t _prev_y, const uint_fast8_t _prev_x, const uint_fast8_t _y,
+			const uint_fast8_t _x);
+		out_layer(const uint_fast8_t _prev_y, const uint_fast8_t _prev_x, const uint_fast8_t _y,
+			const uint_fast8_t _x, const std::vector<node>& _nodes);
+		out_layer(const uint_fast8_t _prev_y, const uint_fast8_t _prev_x, const uint_fast8_t _y,
+			const uint_fast8_t _x, std::vector<node>&& _nodes);
 
 		inline const uint_fast8_t get_prev_x() const { return prev_x; }
 		inline const uint_fast8_t get_prev_y() const { return prev_y; }
@@ -136,6 +148,7 @@ namespace _ga_nn {
 	public:
 		neural_net(const std::vector<uint_fast8_t>& v);
 		neural_net(const std::vector<uint_fast8_t>& v, const std::vector<node>& _nodes);
+		neural_net(const std::vector<uint_fast8_t>& v, std::vector<node>&& _nodes);
 		neural_net(const neural_net& net);
 
 		//cont getters
