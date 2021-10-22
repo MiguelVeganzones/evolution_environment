@@ -270,8 +270,8 @@ _ga_nn::neural_net::neural_net(const std::vector<uint_fast8_t>& v, std::vector<n
 
 	uint_fast8_t i = 0;
 
-	auto start = std::const_iterator(_nodes.begin());
-	auto end = std::make_iterator(start + v[i] * v[i + 1]);
+	std::move_iterator start = std::make_move_iterator(_nodes.begin());
+	std::move_iterator end = (start + v[i] * v[i + 1]);
 
 	p_head = std::make_unique<_ga_nn::in_layer>(_ga_nn::in_layer(v[i], v[i + 1], v[i + 2], v[i + 3], std::vector<node>(start, end)));
 
