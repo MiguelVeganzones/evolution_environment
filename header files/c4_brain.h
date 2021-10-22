@@ -8,17 +8,19 @@ namespace _c4_brain {
 	class c4_brain {
 	private:
 		mutable std::unique_ptr<_ga_nn::neural_net> p_net;
-		std::atomic<uint_fast16_t> wins;
-		std::atomic<uint_fast16_t> losses;
-		std::atomic<uint_fast16_t> ties;
-		uint_fast16_t ID;
+		std::atomic<uint_fast16_t> wins = 0;
+		std::atomic<uint_fast16_t> losses = 0;
+		std::atomic<uint_fast16_t> ties = 0;
+		uint_fast16_t ID = ++s_ID;
 		std::vector<uint_fast8_t> shape;
+//static variable
 		static uint_fast16_t s_ID;
 
 	public:
 		c4_brain(const std::vector<uint_fast8_t>& _shape);
 		c4_brain(const _ga_nn::neural_net& nn);
 		c4_brain(const c4_brain& brain);
+		c4_brain(c4_brain&& other);
 
 		uint_fast8_t weigh(const board& current_board, const bool player) const;
 		//inline static uint_fast8_t s_weigh(const _c4_brain::c4_brain& b, const board& _board) { return b.weigh(_board); }

@@ -9,20 +9,23 @@ using namespace _c4_brain;
 
 uint_fast16_t _c4_brain::c4_brain::s_ID = 0;
 
-_c4_brain::c4_brain::c4_brain(const std::vector<uint_fast8_t>& _shape) : wins{ 0 }, losses{ 0 }, ties{ 0 }, ID{ s_ID++ }, shape{ _shape }
+_c4_brain::c4_brain::c4_brain(const std::vector<uint_fast8_t>& _shape) : shape{ _shape }
 {
 	p_net = std::make_unique<_ga_nn::neural_net>(_ga_nn::neural_net(_shape));
 }
 
-_c4_brain::c4_brain::c4_brain(const _ga_nn::neural_net& nn) : wins{ 0 }, losses{ 0 }, ties{ 0 }, ID{ s_ID++ }, shape{ nn.get_shape() }
+_c4_brain::c4_brain::c4_brain(const _ga_nn::neural_net& nn) : shape{ nn.get_shape() }
 {
 	p_net = std::make_unique<_ga_nn::neural_net>(nn);
 }
 
-_c4_brain::c4_brain::c4_brain(const c4_brain& brain) : wins{ 0 }, losses{ 0 }, ties{ 0 }, ID{ s_ID }, shape{ brain.get_shape() }
+_c4_brain::c4_brain::c4_brain(const c4_brain& brain) : shape{ brain.get_shape() }
 {
 	p_net = std::make_unique<_ga_nn::neural_net>(*brain.get_net());
-	s_ID++;
+}
+
+_c4_brain::c4_brain::c4_brain(c4_brain&& other) : shape(std::move(other.shape)), p_net(std::move(other.p_net)) {
+
 }
 
 uint_fast8_t _c4_brain::c4_brain::weigh(const board& current_board, const bool player) const {

@@ -127,6 +127,7 @@ const _c4_brain::c4_brain _c4_evo_env::simulate_evolution_helper(std::vector<_c4
 	std::vector<_c4_brain::c4_brain> control_group;
 	std::vector<_c4_brain::c4_brain*> control_gen;
 	control_group.reserve(control_group_size);
+	control_gen.reserve(control_group_size);
 
 	for (i = 0; i < control_group_size; ++i) {
 		control_group.emplace_back(_shape);
