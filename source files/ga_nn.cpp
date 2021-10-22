@@ -262,7 +262,7 @@ _ga_nn::neural_net::neural_net(const std::vector<uint_fast8_t>& v, const std::ve
 _ga_nn::neural_net::neural_net(const std::vector<uint_fast8_t>& v, std::vector<node>&& _nodes)
 {
 	assert(v.size() % 2 == 0 && v.size() >= 6);
-
+	std::cout << 'a';
 	shape = v;
 
 	const uint_fast8_t s = v.size();
