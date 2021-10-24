@@ -436,7 +436,7 @@ int main14() {
 	std::cout << "\nBrain ID: " << _c4_brain::c4_brain::get_current_ID() << std::endl;
 
 	//np_i_play_ai(&b, 5, random::randint(0,1));
-	const char* const file_name("../_c4_brains/674412_15_3_100__22_10_2021.txt");
+	const char* const file_name("../_c4_brains/674412_15_3_100.txt");
 
 	b.store(file_name);
 
@@ -445,11 +445,11 @@ int main14() {
 	return EXIT_SUCCESS;
 }
 
-int main15() {
+int main() {
 	//random::init();
 	stopwatch s;
 	const char* const file_name("../_c4_brains/674412_15_3_100.txt");
-	const std::vector<uint_fast8_t> _shape({ 3, 3, 2, 2, 1, 2 });
+	const std::vector<uint_fast8_t> _shape({ 6, 7, 4, 4, 1, 2 });
 	auto b = _c4_brain::read(file_name);
 	_c4_brain::c4_brain b1(_shape);
 
@@ -464,7 +464,7 @@ int main15() {
 	//}
 	 
 	//auto c = _c4_evo_env::simulate_evolution(_c4_evo_env::breed_new_gen(p_gen, 15, 2, 0.8), 3, 100, 2, 3, 5, 2, 0.3, 10);
-	auto c = _c4_evo_env::simulate_evolution(5, 3, 10, _shape, 2, 3, 5, 2, 0.3, 10);
+	auto c = _c4_evo_env::simulate_evolution(15, 3, 100, _shape, 2, 3, 5, 2, 0.3, 10);
 
 	const char* const ret_file_name("../_c4_brains/674412_15_3_100_V2.txt");
 	c.store(ret_file_name);
