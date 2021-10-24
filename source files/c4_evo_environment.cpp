@@ -91,13 +91,6 @@ const _c4_brain::c4_brain _c4_evo_env::simulate_evolution_helper(std::vector<_c4
 {
 	const uint_fast8_t pop_size = _brains.size();
 
-	std::vector<_c4_brain::c4_brain*> _b;
-	_b.reserve(pop_size);
-	for (int i = 0; i < pop_size; ++i) {
-		_b.push_back(&_brains[i]);
-	}
-	std::cout << _c4_brain::population_variability(_b) << std::endl;
-
 	//random::init();
 	//utiity
 	uint_fast8_t i, j;
@@ -114,7 +107,7 @@ const _c4_brain::c4_brain _c4_evo_env::simulate_evolution_helper(std::vector<_c4
 	brains[gi[1]] = std::vector<_c4_brain::c4_brain>(std::make_move_iterator(_brains.begin()),
 													 std::make_move_iterator(_brains.end()));
 
-	std::array<std::vector<_c4_brain::c4_brain*>, 2> gen; //gen[bi[0]] is prev, gen[bi[1]] is current
+	std::array<std::vector<_c4_brain::c4_brain*>, 2> gen; //gen[gi[0]] is previous gen, gen[gi[1]] is current generation
 
 	for (std::vector<_c4_brain::c4_brain*>& e : gen) {
 		e.reserve(pop_size);
@@ -187,7 +180,7 @@ const _c4_brain::c4_brain _c4_evo_env::simulate_evolution_helper(std::vector<_c4
 		//brains[bi[0]] = new gen;
 
 		for (j = 0; j < pop_size; ++j) {
-			gen[gi[0]][j] = &brains[gi[0]][j]; //store current gen pointes in previous gen
+			gen[gi[0]][j] = &brains[gi[0]][j]; //store next gen pointes in previous gen, next current gen
 		}
 
 		//std::cout << "\n###############################\n\n";
@@ -197,6 +190,7 @@ const _c4_brain::c4_brain _c4_evo_env::simulate_evolution_helper(std::vector<_c4
 		//}
 
 		if ((i % control_epochs) == 0) {
+			std::cout << "\nPopulation variability: \n" << _c4_brain::population_variability(gen[gi[1]]);
 			std::cout << "\nControl tournament: " << std::endl;
 			check_progress(control_gen, gen[gi[1]], cur_depth);
 		}

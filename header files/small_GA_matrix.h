@@ -209,7 +209,7 @@ namespace _matrix {
 
 	//measure diference between two matrices
 	template<class T>
-	inline const double d1_distance(const matrix<T>& mat1, const matrix<T>& mat2) {
+	inline double d1_distance(const matrix<T>& mat1, const matrix<T>& mat2) {
 		assert(mat1.get_m() == mat2.get_m() && mat1.get_n() == mat2.get_n());
 
 		double _distance = 0;
@@ -261,7 +261,7 @@ namespace _matrix {
 
 	//crossover two matrices swapping rows
 	template<class T>
-	inline const std::pair<matrix<T>, matrix<T>> row_crossover(const matrix<T>& mat1, const matrix<T>& mat2) {
+	inline std::pair<matrix<T>, matrix<T>> row_crossover(const matrix<T>& mat1, const matrix<T>& mat2) {
 		assert(mat1.get_m() == mat2.get_m() && mat1.get_n() == mat2.get_n());
 
 		const uint_fast8_t m = mat1.get_m();
@@ -404,25 +404,25 @@ namespace _matrix {
 	}
 
 	template<class T>
-	inline const T determinant(const matrix<T>& mat) {
+	inline T determinant(const matrix<T>& mat) {
 		return std::get<1>(PII_LUDecomposition(mat));
 	}
 
-	template<class R = double, class T>
-	inline const R slow_determinant(const matrix<T>& mat) {
+	template<class U = double, class T>
+	inline U slow_determinant(const matrix<T>& mat) {
 		assert(mat.get_m() == mat.get_n());
 
 		const uint_fast8_t n = mat.get_m();
-		R det = 0;
+		U det = 0;
 
 		if (n == 1) { return mat(0, 0); }
 
 		if (n == 2) {
-			return (R)mat(0, 0) * (R)mat(1, 1) - (R)mat(1, 0) * (R)mat(0, 1);
+			return (U)mat(0, 0) * (U)mat(1, 1) - (U)mat(1, 0) * (U)mat(0, 1);
 		}
 
 		for (int x = 0; x < n; ++x) {
-			det += ((x % 2 == 0 ? 1 : -1) * (R)mat(0, x) * slow_determinant<R>(adjunct(mat, n, 0, x)));
+			det += ((x % 2 == 0 ? 1 : -1) * (U)mat(0, x) * slow_determinant<U>(adjunct(mat, n, 0, x)));
 		}
 		return det;
 	}
