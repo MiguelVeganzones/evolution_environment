@@ -25,7 +25,7 @@ void node::mutate(const float p, const float avg, const float stddev, float(*ran
 	weights.mutate(randnormal, p, avg, stddev);
 }
 
-std::valarray<float> node::forward_pass(const std::valarray<float>& v) {
+std::valarray<float> node::forward_pass(const std::valarray<float>& v) const {
 	return _matrix::dot(v, weights);
 }
 

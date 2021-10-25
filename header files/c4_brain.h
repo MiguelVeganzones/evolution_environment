@@ -7,7 +7,7 @@ namespace _c4_brain {
 
 	class c4_brain {
 	private:
-		mutable std::unique_ptr<_ga_nn::neural_net> p_net;
+		std::unique_ptr<_ga_nn::neural_net> p_net;
 		std::atomic<uint_fast16_t> wins = 0;
 		std::atomic<uint_fast16_t> losses = 0;
 		std::atomic<uint_fast16_t> ties = 0;

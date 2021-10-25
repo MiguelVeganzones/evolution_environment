@@ -33,10 +33,9 @@ time a function :
 auto t0 = std::chrono::steady_clock::now();
 f();
 auto t1 = std::chrono::steady_clock::now();
-// std::cout << nanoseconds{t-t0}.count << "ns\";
+// std::cout << nanoseconds{t-t0}.count << "ns\n";
 // std::cout << std::chrono::duration<double>{t1-t0}.count(); // print in floating point seconds
 // std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(t1-t0).count();
-
 
 
 */

@@ -31,11 +31,12 @@ namespace _matrix {
 	private:
 		uint_fast8_t m;
 		uint_fast8_t n;
-		mutable std::vector<std::valarray<T>> data;
+		std::vector<std::valarray<T>> data;
 
 	public:
 		//default ctor
-		inline matrix(const uint_fast8_t _m = 1, const uint_fast8_t _n = 1, const T _default = T(0)) : m{ _m }, n{ _n } {
+		inline matrix(const uint_fast8_t _m = 1, const uint_fast8_t _n = 1, const T _default = T(0)) :
+			m{ _m }, n{ _n } {
 			assert(m != 0 && n != 0);
 			data.resize(m);
 			for (int i = 0; i < m; ++i) {
@@ -46,7 +47,8 @@ namespace _matrix {
 		inline matrix<T>(const matrix<T>&) = default;
 		inline matrix<T>(matrix<T>&&) = default;
 
-		inline matrix(T(*foo)(), const float offset = 0, const uint_fast8_t _m = 1, const uint_fast8_t _n = 1) : m{ _m }, n{ _n } {
+		inline matrix(T(*foo)(), const float offset = 0, const uint_fast8_t _m = 1, const uint_fast8_t _n = 1) :
+			m{ _m }, n{ _n } {
 			assert(m != 0 && n != 0);
 			data.resize(m);
 			for (int i = 0; i < m; ++i) {
@@ -55,16 +57,19 @@ namespace _matrix {
 			}
 		}
 
-		inline matrix(const std::vector<std::valarray<T>>& _data) : m{ (uint_fast8_t)_data.size() }, n{ (uint_fast8_t)size(_data[0]) }, data{ _data }{
+		inline matrix(const std::vector<std::valarray<T>>& _data) :
+			m{ (uint_fast8_t)_data.size() }, n{ (uint_fast8_t)size(_data[0]) }, data{ _data }{
 
 		}
 
 		//row vector ctor
-		inline matrix(const std::valarray<T>& _data) : m{ (uint_fast8_t)_data.size() }, n{ 1 }, data{ std::vector<std::valarray<T>>(1, std::valarray<T>(_data)) }{
+		inline matrix(const std::valarray<T>& _data) :
+			m{ (uint_fast8_t)_data.size() }, n{ 1 }, data{ std::vector<std::valarray<T>>(1, std::valarray<T>(_data)) }{
 
 		}
 
-		inline matrix(const matrix<T>& mat1, const matrix<T>& mat2) : m{ uint_fast8_t(mat1.get_m() + mat2.get_m()) }, n{ mat1.get_n() }{
+		inline matrix(const matrix<T>& mat1, const matrix<T>& mat2) :
+			m{ uint_fast8_t(mat1.get_m() + mat2.get_m()) }, n{ mat1.get_n() }{
 			assert(mat1.get_n() == mat2.get_n());
 
 			data.resize(m);
@@ -83,7 +88,7 @@ namespace _matrix {
 			}
 		}
 
-		inline matrix<T>& operator=(const matrix<T>& other) {
+		inline matrix<T>& operator=(const matrix<T>& other) const {
 			if (this == &other)
 				return *this;
 			m = other.get_m();

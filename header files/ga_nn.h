@@ -14,21 +14,21 @@ namespace _ga_nn {
 	private:
 		uint_fast8_t inputs;
 		uint_fast8_t outputs;
-		mutable _matrix::matrix<float> weights;
+		_matrix::matrix<float> weights;
 
 	public:
 		inline node() : inputs{}, outputs{}, weights{}{};
 		node(const uint_fast8_t _inputs, const uint_fast8_t _outputs);
 		node(const _matrix::matrix<float>& _weights);
-		node(node&&) = default;
-		node(const node&) = default;
+		inline node(node&&) = default;
+		inline node(const node&) = default;
 
 		inline node& operator=(const node&) = default;
 
 		//mutate every weight with a probability of p, according to a normal distribution (by default): Normal(avg, stddev)
 		void mutate(const float p = .5f, const float avg = 0, const float stddev = .2f, float(*randnormal)(float, float) = random::randnormal);
 
-		std::valarray<float> forward_pass(const std::valarray<float>& v);
+		std::valarray<float> forward_pass(const std::valarray<float>& v) const;
 
 		//getters
 		inline const _matrix::matrix<float>& get() const { return weights; }
@@ -57,7 +57,7 @@ namespace _ga_nn {
 	protected:
 		uint_fast8_t x, y; // shape of the layer
 		uint_fast8_t m, n; // shape of the matrix in each node
-		mutable std::vector<node> nodes;
+		std::vector<node> nodes;
 	public:
 		layer(const uint_fast8_t _y, const uint_fast8_t _x, const uint_fast8_t m, const uint_fast8_t n);
 		layer(const uint_fast8_t _y, const uint_fast8_t _x, const std::vector<node>& _nodes);
@@ -141,9 +141,9 @@ namespace _ga_nn {
 
 	class neural_net {
 	private:
-		mutable std::unique_ptr<in_layer> p_head;
-		mutable std::vector<std::unique_ptr<hidden_layer>> p_hidden;
-		mutable std::unique_ptr<out_layer> p_tail;
+		std::unique_ptr<in_layer> p_head;
+		std::vector<std::unique_ptr<hidden_layer>> p_hidden;
+		std::unique_ptr<out_layer> p_tail;
 		std::vector<uint_fast8_t> shape;
 	public:
 		neural_net(const std::vector<uint_fast8_t>& v);
