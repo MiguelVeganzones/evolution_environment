@@ -5,39 +5,38 @@
 #include <execution>
 
 std::vector<_c4_brain::c4_brain*> _c4_evo_env::selection_operator(const std::vector<_c4_brain::c4_brain*>& brains,
-	const std::vector<float>& winrate, float alpha, uint_fast8_t n)
+	const std::valarray<double>& winrate, float alpha, uint_fast8_t n)
 {
 	assert(brains.size() == winrate.size());
 	const uint_fast8_t _size = brains.size();
 
-	std::vector<float> _winrate(winrate);
+	std::valarray<double> _winrate(winrate);
 	std::vector<uint_fast8_t> _parents(n);
 
 	const _matrix::matrix<double> variability_matrix = _c4_brain::population_variability(brains);
 	std::valarray<double> distance_vector(_size);
-	std::vector<float> weight_vector(_size);
+	std::valarray<double> weight_vector(_size);
 
 	uint_fast8_t i, j, _index;
 
-	_index = std::distance(_winrate.begin(), std::max_element(_winrate.begin(), _winrate.end())); //index of max winrate
+	_index = std::distance(std::begin(_winrate), std::max_element(std::begin(_winrate), std::end(_winrate))); //index of max winrate
 	_parents[0] = _index;
 
 	for (i = 1; i < n; ++i) {
 		_winrate[_index] = NAN;
 		distance_vector = variability_matrix[_index] * winrate[_index] * alpha;
-		for (j = 0; j < _size; ++j) {
-			if (j == _index) { weight_vector[j] = 0; continue; }
-			weight_vector[j] = distance_vector[j] + winrate[j];
-		}
-		_index = std::distance(weight_vector.begin(), std::max_element(weight_vector.begin(), weight_vector.end())); //index of max weight
+
+		weight_vector = distance_vector + _winrate;
+
+		_index = std::distance(std::begin(weight_vector), std::max_element(std::begin(weight_vector), std::end(weight_vector))); //index of max weight
 		_parents[i] = _index;
 	}
 
 	std::vector<_c4_brain::c4_brain*> ret;
 	ret.reserve(n);
 
-	for (i = 0; i < n; ++i) {
-		ret.push_back(brains[_parents[i]]);
+	for (auto p_idx: _parents) {
+		ret.push_back(brains[p_idx]);
 	}
 
 	return ret;
@@ -95,7 +94,7 @@ const _c4_brain::c4_brain _c4_evo_env::simulate_evolution_helper(std::vector<_c4
 	//utiity
 	uint_fast8_t i, j;
 	std::array<uint_fast8_t, 2> gi({ 0,1 }); //gen index
-	std::vector<float> weights(pop_size);
+	std::valarray<double> weights(pop_size);
 	std::vector<_c4_brain::c4_brain*> _parents(parents, nullptr);
 
 	//brain vectors a and b will hold previous or current generation depending on the epoch
@@ -144,7 +143,7 @@ const _c4_brain::c4_brain _c4_evo_env::simulate_evolution_helper(std::vector<_c4
 		//}
 
 		if (i == (epochs - 1)) {
-			uint_fast8_t ret_i = std::distance(weights.begin(), std::max_element(weights.begin(), weights.end()));
+			uint_fast8_t ret_i = std::distance(std::begin(weights), std::max_element(std::begin(weights), std::end(weights)));
 			//for (const auto& e : gen[gi[0]]) {
 			//	e->print_stats();
 			//}

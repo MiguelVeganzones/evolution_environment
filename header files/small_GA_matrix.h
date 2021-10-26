@@ -88,7 +88,7 @@ namespace _matrix {
 			}
 		}
 
-		inline matrix<T>& operator=(const matrix<T>& other) const {
+		inline matrix<T>& operator=(const matrix<T>& other) {
 			if (this == &other)
 				return *this;
 			m = other.get_m();
