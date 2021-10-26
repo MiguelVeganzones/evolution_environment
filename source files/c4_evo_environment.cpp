@@ -5,16 +5,14 @@
 #include <execution>
 
 std::vector<_c4_brain::c4_brain*> _c4_evo_env::selection_operator(const std::vector<_c4_brain::c4_brain*>& brains,
-	const std::valarray<double>& winrate, float alpha, uint_fast8_t n)
+	std::valarray<double>&& _winrate, float alpha, uint_fast8_t n)
 {
 	assert(brains.size() == winrate.size());
 	const uint_fast8_t _size = brains.size();
 
-	std::valarray<double> _winrate(winrate);
 	std::vector<uint_fast8_t> _parents(n);
 
 	const _matrix::matrix<double> variability_matrix = _c4_brain::population_variability(brains);
-	std::valarray<double> distance_vector(_size);
 	std::valarray<double> weight_vector(_size);
 
 	uint_fast8_t i, j, _index;
@@ -24,9 +22,8 @@ std::vector<_c4_brain::c4_brain*> _c4_evo_env::selection_operator(const std::vec
 
 	for (i = 1; i < n; ++i) {
 		_winrate[_index] = NAN;
-		distance_vector = variability_matrix[_index] * winrate[_index] * alpha;
 
-		weight_vector = distance_vector + _winrate;
+		weight_vector = variability_matrix[_index] * _winrate[_index] * alpha + _winrate;
 
 		_index = std::distance(std::begin(weight_vector), std::max_element(std::begin(weight_vector), std::end(weight_vector))); //index of max weight
 		_parents[i] = _index;
@@ -154,7 +151,7 @@ const _c4_brain::c4_brain _c4_evo_env::simulate_evolution_helper(std::vector<_c4
 			return brains[gi[1]][ret_i];
 		}
 
-		_parents = selection_operator(gen[gi[1]], weights, alpha(i, epochs), parents);
+		_parents = selection_operator(gen[gi[1]], std::move(weights), alpha(i, epochs), parents);
 
 
 		//std::cout << "Parents: \n";

@@ -19,7 +19,7 @@ namespace _c4_evo_env {
 	/// <param name="n"> Number of parents to select </param>
 	/// <returns> vector of pointers to selected brains </returns>
 	std::vector<_c4_brain::c4_brain*> selection_operator(const std::vector<_c4_brain::c4_brain*>& brains,
-		const std::valarray<double>& winrate, float alpha, uint_fast8_t n);
+		std::valarray<double>&& winrate, float alpha, uint_fast8_t n);
 
 	void tournament(const std::vector<_c4_brain::c4_brain*>& prev_gen, const std::vector<_c4_brain::c4_brain*>& curr_gen,
 		uint_fast8_t prev_depth, const uint_fast8_t curr_depth, const bool print = 0);
