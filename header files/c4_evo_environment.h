@@ -37,22 +37,23 @@ namespace _c4_evo_env {
 		/// <param name="control_epochs"> Number of epochs between each progress check against a control population </param>
 		/// <returns> Copy of the best brain of the last generation by value </returns>
 	const _c4_brain::c4_brain simulate_evolution(const uint_fast8_t pop_size, const uint_fast8_t parents,
-		const uint_fast8_t epochs, const std::vector<uint_fast8_t>& _shape,
+		const uint_fast16_t epochs, const std::vector<uint_fast8_t>& _shape,
 		const uint_fast8_t cur_depth = 2, const uint_fast8_t prev_depth = 3, const uint_fast8_t control_epochs = 10,
 		const uint_fast8_t top_n = 1, const float mutation_p = 0.2, const uint_fast8_t control_group_size = 10);
 
 	const _c4_brain::c4_brain simulate_evolution(std::vector<_c4_brain::c4_brain>&& _brains, const uint_fast8_t parents,
-		const uint_fast8_t epochs,
+		const uint_fast16_t epochs,
 		const uint_fast8_t cur_depth = 2, const uint_fast8_t prev_depth = 3, const uint_fast8_t control_epochs = 10,
 		const uint_fast8_t top_n = 1, const float mutation_p = 0.2, const uint_fast8_t control_group_size = 10);
 
-	const _c4_brain::c4_brain simulate_evolution_helper(std::vector<_c4_brain::c4_brain>&& _brains, const uint_fast8_t parents, const uint_fast8_t epochs,
+	const _c4_brain::c4_brain simulate_evolution_helper(std::vector<_c4_brain::c4_brain>&& _brains, const uint_fast8_t parents,
+		const uint_fast16_t epochs,
 		const std::vector<uint_fast8_t>& _shape, const uint_fast8_t cur_depth, const uint_fast8_t prev_depth, const uint_fast8_t control_epochs,
 		const uint_fast8_t top_n, const float mutation_p, const uint_fast8_t control_group_size);
 
 	//part meiosis, part mitosis. Top n individuals get into the new gen as is 
 	std::vector<_c4_brain::c4_brain> breed_new_gen(const std::vector<_c4_brain::c4_brain*>& parents, 
-		const uint_fast8_t pop_size, const uint_fast8_t top_n, const float mutation_p);
+		const uint_fast8_t pop_size, const uint_fast8_t top_n, const float mutation_p, const float alpha = 0.5f);
 
 	void check_progress(const std::vector<_c4_brain::c4_brain*>& control_group,
 		const std::vector<_c4_brain::c4_brain*>& cur_gen, const uint_fast8_t depth);
@@ -60,6 +61,6 @@ namespace _c4_evo_env {
 	void _round(const std::vector<_c4_brain::c4_brain*>& prev_gen, _c4_brain::c4_brain* curr,
 		const uint_fast8_t prev_depth, const uint_fast8_t curr_depth);
 
-	inline float alpha(const uint_fast8_t i, const uint_fast8_t epochs) { return 1 - i / epochs; }
+	inline float alpha(const uint_fast8_t i, const uint_fast16_t epochs, const float rescale = 1) { return (1 - i / epochs) * rescale; }
 	inline uint_fast8_t make_even(const uint_fast8_t n) { return (n / 2) * 2; }
 }

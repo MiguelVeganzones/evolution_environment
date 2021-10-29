@@ -47,12 +47,12 @@ layer::layer(const uint_fast8_t _y, const uint_fast8_t _x, const uint_fast8_t _m
 }
 
 _ga_nn::layer::layer(const uint_fast8_t _y, const uint_fast8_t _x, const std::vector<node>& _nodes) :
-	nodes{ _nodes }, x{ _x }, y{ _y }, m{ _nodes[0].get_m() }, n{ _nodes[0].get_n() }{
+	x{ _x }, y{ _y }, m{ _nodes[0].get_m() }, n{ _nodes[0].get_n() }, nodes{ _nodes }{
 
 }
 
 _ga_nn::layer::layer(const uint_fast8_t _y, const uint_fast8_t _x, std::vector<node>&& _nodes) :
-	m{ _nodes[0].get_m() }, n{ _nodes[0].get_n() }, nodes{ std::move(_nodes) }, x{ _x }, y{ _y }{
+	x{ _x }, y{ _y }, m{ _nodes[0].get_m() }, n{ _nodes[0].get_n() }, nodes{ std::move(_nodes) } {
 
 }
 
@@ -76,14 +76,19 @@ _ga_nn::in_layer::in_layer(const uint_fast8_t _y, const uint_fast8_t _x, const u
 //constructor from vector of nodes
 _ga_nn::in_layer::in_layer(const uint_fast8_t _y, const uint_fast8_t _x, const uint_fast8_t _next_y,
 	const uint_fast8_t _next_x, const std::vector<node>& _nodes) : 
-	layer(_y, _x, _nodes), next_y{_next_y}, next_x{_next_x}{
+	layer(_y, _x, _nodes), next_x{ _next_x }, next_y{ _next_y } {
 
 }
 
 _ga_nn::in_layer::in_layer(const uint_fast8_t _y, const uint_fast8_t _x, const uint_fast8_t _next_y,
 	const uint_fast8_t _next_x, std::vector<node>&& _nodes) :
-next_y{ _next_y }, next_x{ _next_x }, layer(_y, _x, std::move(_nodes)) {
+	layer{ _y, _x, std::move(_nodes) }, next_x{ _next_x }, next_y{ _next_y } {
 
+}
+
+_ga_nn::in_layer::in_layer(in_layer&& other) noexcept :
+	layer(other.y, other.x, { std::make_move_iterator(std::begin(other.nodes)), std::make_move_iterator(std::end(other.nodes)) }),
+	next_x{ other.next_x }, next_y{ other.next_y } {
 }
 
 std::vector<_matrix::matrix<float>> _ga_nn::in_layer::forward_pass(const _matrix::matrix<float>& data,
@@ -105,20 +110,27 @@ std::vector<_matrix::matrix<float>> _ga_nn::in_layer::forward_pass(const _matrix
 }
 
 _ga_nn::hidden_layer::hidden_layer(const uint_fast8_t _prev_y, const uint_fast8_t _prev_x, const uint_fast8_t _y, const uint_fast8_t _x,
-	const uint_fast8_t _next_y, const uint_fast8_t _next_x) : layer(_y, _x, _prev_y* _prev_x, _next_y* _next_x),
-	prev_x{ _prev_x }, prev_y{ _prev_y }, next_x{ _next_x }, next_y{ _next_y }{
+	const uint_fast8_t _next_y, const uint_fast8_t _next_x) : 
+	layer(_y, _x, _prev_y* _prev_x, _next_y* _next_x),
+	next_x{ _next_x }, next_y{ _next_y }, prev_x{ _prev_x }, prev_y{ _prev_y } {
 
 }
 
 _ga_nn::hidden_layer::hidden_layer(const uint_fast8_t _prev_y, const uint_fast8_t _prev_x, const uint_fast8_t _y, const uint_fast8_t _x,
 	const uint_fast8_t _next_y, const uint_fast8_t _next_x, const std::vector<node>& _nodes) : 
-	layer(_y, _x, _nodes), prev_x{ _prev_x }, prev_y{ _prev_y }, next_x{ _next_x }, next_y{ _next_y }{
+	layer(_y, _x, _nodes), next_x{ _next_x }, next_y{ _next_y }, prev_x{ _prev_x }, prev_y{ _prev_y } {
 
 }
 
 _ga_nn::hidden_layer::hidden_layer(const uint_fast8_t _prev_y, const uint_fast8_t _prev_x, const uint_fast8_t _y, const uint_fast8_t _x,
 	const uint_fast8_t _next_y, const uint_fast8_t _next_x, std::vector<node>&& _nodes) :
-	prev_x{ _prev_x }, prev_y{ _prev_y }, next_x{ _next_x }, next_y{ _next_y }, layer(_y, _x, std::move(_nodes)) {
+	layer{_y, _x, std::move(_nodes)}, next_x{ _next_x }, next_y{ _next_y }, prev_x{ _prev_x }, prev_y{ _prev_y } {
+
+}
+
+_ga_nn::hidden_layer::hidden_layer(hidden_layer&& other) noexcept :
+	layer(other.y, other.x, { std::make_move_iterator(std::begin(other.nodes)), std::make_move_iterator(std::end(other.nodes)) }),
+	next_x{ other.next_x }, next_y{ other.next_y }, prev_x{ other.prev_x }, prev_y{ other.prev_y } {
 
 }
 
@@ -167,7 +179,13 @@ _ga_nn::out_layer::out_layer(const uint_fast8_t _prev_y, const uint_fast8_t _pre
 
 _ga_nn::out_layer::out_layer(const uint_fast8_t _prev_y, const uint_fast8_t _prev_x, const uint_fast8_t _y,
 	const uint_fast8_t _x, std::vector<node>&& _nodes) :
-	prev_x{ _prev_x }, prev_y{ _prev_y }, layer(_y, _x, std::move(_nodes)) {
+	layer{_y, _x, std::move(_nodes)}, prev_x{ _prev_x }, prev_y{ _prev_y } {
+
+}
+
+_ga_nn::out_layer::out_layer(out_layer&& other) noexcept :
+	layer{ other.y, other.x, { std::make_move_iterator(std::begin(other.nodes)), std::make_move_iterator(std::end(other.nodes)) } },
+	prev_x{ other.prev_x }, prev_y{ other.prev_y } {
 
 }
 
@@ -193,10 +211,8 @@ std::valarray<float> _ga_nn::out_layer::forward_pass(const std::vector<_matrix::
 	return foo(ret);
 }
 
-_ga_nn::neural_net::neural_net(const std::vector<uint_fast8_t>& v) {
+_ga_nn::neural_net::neural_net(const std::vector<uint_fast8_t>& v) : shape{ v } {
 	assert(v.size() % 2 == 0 && v.size() >= 6);
-
-	shape = v;
 
 	const uint_fast8_t s = v.size();
 	p_hidden.resize(int(s / 2) - 2);
@@ -217,11 +233,9 @@ _ga_nn::neural_net::neural_net(const std::vector<uint_fast8_t>& v) {
 /// </summary>
 /// <param name="v"></param>
 /// <param name="_nodes"></param>
-_ga_nn::neural_net::neural_net(const std::vector<uint_fast8_t>& v, const std::vector<node>& _nodes)
+_ga_nn::neural_net::neural_net(const std::vector<uint_fast8_t>& v, const std::vector<node>& _nodes) : shape{ v }
 {
 	assert(v.size() % 2 == 0 && v.size() >= 6);
-
-	shape = v;
 
 	const uint_fast8_t s = v.size();
 	p_hidden.resize(int(s / 2) - 2);
@@ -257,10 +271,9 @@ _ga_nn::neural_net::neural_net(const std::vector<uint_fast8_t>& v, const std::ve
 /// </summary>
 /// <param name="v"></param>
 /// <param name="_nodes"></param>
-_ga_nn::neural_net::neural_net(const std::vector<uint_fast8_t>& v, std::vector<node>&& _nodes)
+_ga_nn::neural_net::neural_net(const std::vector<uint_fast8_t>& v, std::vector<node>&& _nodes) : shape{ v }
 {
 	assert(v.size() % 2 == 0 && v.size() >= 6);
-	shape = v;
 
 	const uint_fast8_t s = v.size();
 	p_hidden.resize(int(s / 2) - 2);
@@ -287,7 +300,7 @@ _ga_nn::neural_net::neural_net(const std::vector<uint_fast8_t>& v, std::vector<n
 	p_tail = std::make_unique<_ga_nn::out_layer>(_ga_nn::out_layer(v[i - 2], v[i - 1], v[i], v[i + 1], std::vector<node>(start, end)));
 }
 
-_ga_nn::neural_net::neural_net(const neural_net& net): shape{net.shape}
+_ga_nn::neural_net::neural_net(const neural_net& net): shape{ net.shape }
 {
 	p_head = std::make_unique<_ga_nn::in_layer>(*net.get_head());
 
@@ -298,6 +311,12 @@ _ga_nn::neural_net::neural_net(const neural_net& net): shape{net.shape}
 	}
 
 	p_tail = std::make_unique<_ga_nn::out_layer>(*net.get_tail());
+}
+
+_ga_nn::neural_net::neural_net(neural_net&& other) noexcept :
+	p_head{ std::move(other.p_head) }, 
+	p_hidden{ std::make_move_iterator(std::begin(other.p_hidden)), std::make_move_iterator(std::end(other.p_hidden)) },
+	p_tail{ std::move(other.p_tail) }, shape{ std::move(other.shape) } {
 }
 
 const uint_fast16_t _ga_nn::neural_net::parameter_count() const
@@ -336,6 +355,7 @@ std::valarray<float> _ga_nn::neural_net::forard_pass(const _matrix::matrix<float
 
 void _ga_nn::neural_net::mutate(float p, float avg, float stddev)
 {
+	if (p == 0.f) { return; }
 	p_head->mutate(p, avg, stddev);
 	for (auto& hidden : p_hidden)hidden->mutate(p, avg, stddev);
 	p_tail->mutate(p, avg, stddev);
@@ -663,15 +683,15 @@ double _ga_nn::d1_distance(const _ga_nn::neural_net& net1, const _ga_nn::neural_
 	return _d1_distance;
 }
 
-const _matrix::matrix<double> _ga_nn::population_variability(const std::vector<_ga_nn::neural_net*>& nets)
+const _matrix::matrix<double> _ga_nn::population_variability(const std::vector<_ga_nn::neural_net*>& nets, const double null_case)
 {
 	const uint_fast8_t _size = nets.size();
-	_matrix::matrix<double> distance_matrix(_size, _size, double(NAN));
+	_matrix::matrix<double> distance_matrix(_size, _size, null_case);
 
 	double d_ij;
 
-	for (uint_fast8_t j = 0; j < _size - 1; ++j) {
-		for (uint_fast8_t i = j + 1; i < _size; ++i) {
+	for (uint_fast8_t j = 1; j < _size; ++j) {
+		for (uint_fast8_t i = 0; i < j; ++i) {
 			d_ij = d1_distance(*nets[j], *nets[i]);
 			distance_matrix(j, i) = d_ij;
 			distance_matrix(i, j) = d_ij;
@@ -681,15 +701,15 @@ const _matrix::matrix<double> _ga_nn::population_variability(const std::vector<_
 	return distance_matrix;
 }
 
-const _matrix::matrix<double> _ga_nn::population_variability(const std::vector<std::reference_wrapper<_ga_nn::neural_net>>& nets)
+const _matrix::matrix<double> _ga_nn::population_variability(const std::vector<std::reference_wrapper<_ga_nn::neural_net>>& nets, const double null_case)
 {
 	const uint_fast8_t _size = nets.size();
-	_matrix::matrix<double> distance_matrix(_size, _size, double(NAN));
+	_matrix::matrix<double> distance_matrix(_size, _size, null_case);
 
 	double d_ij;
 
-	for (uint_fast8_t j = 0; j < _size - 1; ++j) {
-		for (uint_fast8_t i = j + 1; i < _size; ++i) {
+	for (uint_fast8_t j = 1; j < _size; ++j) {
+		for (uint_fast8_t i = 0; i < j; ++i) {
 			d_ij = d1_distance(nets[j], nets[i]);
 			distance_matrix(j, i) = d_ij;
 			distance_matrix(i, j) = d_ij;

@@ -19,11 +19,15 @@ std::vector<_c4_brain::c4_brain*> _c4_evo_env::selection_operator(const std::vec
 
 	_index = std::distance(std::begin(_winrate), std::max_element(std::begin(_winrate), std::end(_winrate))); //index of max winrate
 	_parents[0] = _index;
+	float _prev_winrate = 0;
+	float max_d; //max distance to normalice distances every iteration
 
 	for (i = 1; i < n; ++i) {
-		_winrate[_index] = NAN;
+		_prev_winrate = _winrate[_index];
+		_winrate[_index] = std::numeric_limits<double>::lowest();
 
-		weight_vector = variability_matrix[_index] * _winrate[_index] * alpha + _winrate;
+		max_d = *std::max_element(std::begin(variability_matrix[_index]), std::end(variability_matrix[_index]));
+		weight_vector = variability_matrix[_index] / max_d * _prev_winrate * alpha + _winrate;
 
 		_index = std::distance(std::begin(weight_vector), std::max_element(std::begin(weight_vector), std::end(weight_vector))); //index of max weight
 		_parents[i] = _index;
@@ -53,7 +57,7 @@ void _c4_evo_env::tournament(const std::vector<_c4_brain::c4_brain*>& prev_gen, 
 	}
 }		
 
-const _c4_brain::c4_brain _c4_evo_env::simulate_evolution(const uint_fast8_t pop_size, const uint_fast8_t parents, const uint_fast8_t epochs,
+const _c4_brain::c4_brain _c4_evo_env::simulate_evolution(const uint_fast8_t pop_size, const uint_fast8_t parents, const uint_fast16_t epochs,
 	const std::vector<uint_fast8_t>& _shape, const uint_fast8_t cur_depth, const uint_fast8_t prev_depth, const uint_fast8_t control_epochs,
 	const uint_fast8_t top_n, const float mutation_p, const uint_fast8_t control_group_size)
 {
@@ -73,7 +77,7 @@ const _c4_brain::c4_brain _c4_evo_env::simulate_evolution(const uint_fast8_t pop
 }
 
 const _c4_brain::c4_brain _c4_evo_env::simulate_evolution(std::vector<_c4_brain::c4_brain>&& _brains, const uint_fast8_t parents,
-	const uint_fast8_t epochs, const uint_fast8_t cur_depth, const uint_fast8_t prev_depth,
+	const uint_fast16_t epochs, const uint_fast8_t cur_depth, const uint_fast8_t prev_depth,
 	const uint_fast8_t control_epochs, const uint_fast8_t top_n, const float mutation_p, const uint_fast8_t control_group_size)
 {
 	return simulate_evolution_helper(std::move(_brains), parents, epochs, _brains[0].get_shape(),
@@ -81,7 +85,7 @@ const _c4_brain::c4_brain _c4_evo_env::simulate_evolution(std::vector<_c4_brain:
 }
 
 const _c4_brain::c4_brain _c4_evo_env::simulate_evolution_helper(std::vector<_c4_brain::c4_brain>&& _brains, const uint_fast8_t parents, 
-	const uint_fast8_t epochs, const std::vector<uint_fast8_t>& _shape, const uint_fast8_t cur_depth, 
+	const uint_fast16_t epochs, const std::vector<uint_fast8_t>& _shape, const uint_fast8_t cur_depth, 
 	const uint_fast8_t prev_depth, const uint_fast8_t control_epochs,
 	const uint_fast8_t top_n, const float mutation_p, const uint_fast8_t control_group_size)
 {
@@ -89,7 +93,8 @@ const _c4_brain::c4_brain _c4_evo_env::simulate_evolution_helper(std::vector<_c4
 
 	//random::init();
 	//utiity
-	uint_fast8_t i, j;
+	uint_fast8_t j;
+	uint_fast16_t i = 0;
 	std::array<uint_fast8_t, 2> gi({ 0,1 }); //gen index
 	std::valarray<double> weights(pop_size);
 	std::vector<_c4_brain::c4_brain*> _parents(parents, nullptr);
@@ -171,7 +176,7 @@ const _c4_brain::c4_brain _c4_evo_env::simulate_evolution_helper(std::vector<_c4
 		//	brains[gi[0]].emplace_back(_shape);
 		//}
 
-		brains[gi[0]] = breed_new_gen(_parents, pop_size, top_n, mutation_p);
+		brains[gi[0]] = breed_new_gen(_parents, pop_size, top_n, mutation_p, alpha(i, epochs));
 
 		//brains[bi[0]] = new gen;
 
@@ -198,7 +203,7 @@ const _c4_brain::c4_brain _c4_evo_env::simulate_evolution_helper(std::vector<_c4
 }
 
 std::vector<_c4_brain::c4_brain> _c4_evo_env::breed_new_gen(const std::vector<_c4_brain::c4_brain*>& parents,
-	const uint_fast8_t pop_size, const uint_fast8_t top_n, const float mutation_p)
+	const uint_fast8_t pop_size, const uint_fast8_t top_n, const float mutation_p, const float alpha)
 {
 	assert((top_n < pop_size) and (mutation_p <= 1) and (mutation_p >= 0) and (parents.size() >= top_n));
 
@@ -230,13 +235,15 @@ std::vector<_c4_brain::c4_brain> _c4_evo_env::breed_new_gen(const std::vector<_c
 	if(mito){
 		a = random::randint(0, np - 1);
 		_ga_nn::neural_net temp(*parents[a]->get_net().get());
-		temp.mutate();
+		temp.mutate(0.2f, random::randfloat() * 0.2f, random::randfloat() * 0.2f);
 		ret.emplace_back(std::move(temp));
 	}
 
 	for (i = top_n; i < pop_size; ++i) {
 		if (random::randfloat() < mutation_p) {
-			ret[i].mutate();
+			const float stddev = 0.38 * alpha + 0.02; //decreases linearly with alpha: 0.4 >= x >= 0.02
+												     // if alpha == alpha(iter, epochs), x decreases linearly with epochs			
+			ret[i].mutate(0.1f, 0, stddev);
 		}
 	}
 

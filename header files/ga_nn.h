@@ -62,6 +62,8 @@ namespace _ga_nn {
 		layer(const uint_fast8_t _y, const uint_fast8_t _x, const uint_fast8_t m, const uint_fast8_t n);
 		layer(const uint_fast8_t _y, const uint_fast8_t _x, const std::vector<node>& _nodes);
 		layer(const uint_fast8_t _y, const uint_fast8_t _x, std::vector<node>&& _nodes);
+		layer(layer&&) = default;
+		layer(const layer&) = default;
 
 		inline const std::vector<node>& get() const { return nodes; }
 		inline const uint_fast8_t get_x() const { return x; }
@@ -84,6 +86,8 @@ namespace _ga_nn {
 		in_layer(const uint_fast8_t _y, const uint_fast8_t _x, const uint_fast8_t _next_y, const uint_fast8_t _next_x);
 		in_layer(const uint_fast8_t _y, const uint_fast8_t _x, const uint_fast8_t _next_y, const uint_fast8_t _next_x, const std::vector<node>& _nodes);
 		in_layer(const uint_fast8_t _y, const uint_fast8_t _x, const uint_fast8_t _next_y, const uint_fast8_t _next_x, std::vector<node>&& _nodes);
+		in_layer(in_layer&& other) noexcept;
+		in_layer(const in_layer&) = default;
 
 		inline const uint_fast8_t get_next_x() const { return next_x; }
 		inline const uint_fast8_t get_next_y() const { return next_y; }
@@ -106,6 +110,8 @@ namespace _ga_nn {
 			const uint_fast8_t _next_y, const uint_fast8_t _next_x, const std::vector<node>& _nodes);
 		hidden_layer(const uint_fast8_t _prev_y, const uint_fast8_t _prev_x, const uint_fast8_t _y, const uint_fast8_t _x,
 			const uint_fast8_t _next_y, const uint_fast8_t _next_x, std::vector<node>&& _nodes);
+		hidden_layer(hidden_layer&& other) noexcept;
+		hidden_layer(const hidden_layer&) = default;
 
 		inline const uint_fast8_t get_next_x() const { return next_x; }
 		inline const uint_fast8_t get_next_y() const { return next_y; }
@@ -129,6 +135,8 @@ namespace _ga_nn {
 			const uint_fast8_t _x, const std::vector<node>& _nodes);
 		out_layer(const uint_fast8_t _prev_y, const uint_fast8_t _prev_x, const uint_fast8_t _y,
 			const uint_fast8_t _x, std::vector<node>&& _nodes);
+		out_layer(out_layer&& other) noexcept;
+		out_layer(const out_layer&) = default;
 
 		inline const uint_fast8_t get_prev_x() const { return prev_x; }
 		inline const uint_fast8_t get_prev_y() const { return prev_y; }
@@ -150,6 +158,7 @@ namespace _ga_nn {
 		neural_net(const std::vector<uint_fast8_t>& v, const std::vector<node>& _nodes);
 		neural_net(const std::vector<uint_fast8_t>& v, std::vector<node>&& _nodes);
 		neural_net(const neural_net& net);
+		neural_net(neural_net&& other) noexcept;
 
 		//cont getters
 		inline const std::unique_ptr<in_layer>& get_head() const { return p_head; }
@@ -190,6 +199,6 @@ namespace _ga_nn {
 
 	double d1_distance(const _ga_nn::neural_net& net1, const _ga_nn::neural_net& net2);
 
-	const _matrix::matrix<double> population_variability(const std::vector<_ga_nn::neural_net*>& nets);
-	const _matrix::matrix<double> population_variability(const std::vector<std::reference_wrapper<_ga_nn::neural_net>>& nets);
+	const _matrix::matrix<double> population_variability(const std::vector<_ga_nn::neural_net*>& nets, const double null_case = NAN);
+	const _matrix::matrix<double> population_variability(const std::vector<std::reference_wrapper<_ga_nn::neural_net>>& nets, const double null_case = NAN);
 }

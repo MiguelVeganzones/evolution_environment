@@ -24,7 +24,7 @@ _c4_brain::c4_brain::c4_brain(const c4_brain& brain) : shape{ brain.get_shape() 
 	p_net = std::make_unique<_ga_nn::neural_net>(*brain.get_net());
 }
 
-_c4_brain::c4_brain::c4_brain(c4_brain&& other) noexcept : shape(std::move(other.shape)), p_net(std::move(other.p_net)) {
+_c4_brain::c4_brain::c4_brain(c4_brain&& other) noexcept : p_net(std::move(other.p_net)), shape(std::move(other.shape)) {
 
 }
 
@@ -195,7 +195,7 @@ const _matrix::matrix<double> _c4_brain::population_variability(const std::vecto
 	for (const auto& b : brains) {
 		nets.push_back(b->get_net().get());
 	}
-	return _ga_nn::population_variability(std::move(nets));
+	return _ga_nn::population_variability(std::move(nets), 0);
 }
 
 const _matrix::matrix<double> _c4_brain::population_variability(const std::vector<std::reference_wrapper<c4_brain>>& brains)
