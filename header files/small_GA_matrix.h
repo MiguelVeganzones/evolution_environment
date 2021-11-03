@@ -58,7 +58,7 @@ namespace _matrix {
 		}
 
 		inline matrix(const std::vector<std::valarray<T>>& _data) :
-			m{ (uint_fast8_t)_data.size() }, n{ (uint_fast8_t)size(_data[0]) }, data{ _data }{
+			m{ (uint_fast8_t)_data.size() }, n{ (uint_fast8_t)_data[0].size() }, data{ _data }{
 
 		}
 
@@ -350,7 +350,7 @@ namespace _matrix {
 
 	//matrix-matrix dot product implementation
 	template<class T>
-	inline matrix<T> dot(const matrix<T>& mat1, const matrix<T>& mat2) { //dot product implementation
+	inline matrix<T> big_mat_dot(const matrix<T>& mat1, const matrix<T>& mat2) { //dot product  with transpose for better data locality
 		assert(mat1.get_n() == mat2.get_m());
 
 		const auto _m = mat1.get_m(); //return dim m
@@ -361,6 +361,28 @@ namespace _matrix {
 		for (int j = 0; j < _m; ++j) {
 			for (int i = 0; i < _n; ++i) {
 				ret_data[j][i] = std::inner_product(std::begin(mat1[j]), std::end(mat1[j]), std::begin(mat2_t[i]), T(0));
+			}
+		}
+		return ret_data;
+	}
+
+	//matrix-matrix dot product implementation
+	template<class T>
+	inline matrix<T> dot(const matrix<T>& mat1, const matrix<T>& mat2) { //smaller matrix dot product implementation
+		assert(mat1.get_n() == mat2.get_m());
+
+		const auto _m = mat1.get_m(); //return dim m
+		const auto _n = mat2.get_n(); //return dim n
+		std::vector<std::valarray<T>> ret_data(_m, std::valarray<T>(_n));
+		T _val(0), jj(0);
+		for (int j = 0; j < _m; ++j) {
+			for (int i = 0; i < _n; ++i) {
+				_val = 0;
+				jj = 0;
+				for (auto iter1 = std::begin(mat1[j]); iter1 != std::end(mat1[j]); ++iter1) {
+					_val += *iter1 * mat2[jj++][i];
+				}
+				ret_data[j][i] = _val;
 			}
 		}
 		return ret_data;
@@ -379,7 +401,7 @@ namespace _matrix {
 
 	//vector-matrix dot product implementation
 	template<class T>
-	inline std::valarray<T> dot(const std::valarray<T>& v, const matrix<T>& mat) {//vector-matrix dot product implementation, returns ROW vector as a valarray
+	inline std::valarray<T> big_mat_dot(const std::valarray<T>& v, const matrix<T>& mat) {//vector-matrix dot product implementation, returns ROW vector as a valarray
 		assert(v.size() == mat.get_m());
 
 		const auto _n = mat.get_n(); //return dim n
@@ -392,7 +414,43 @@ namespace _matrix {
 		return ret_data;
 	}
 
+	//vector-matrix dot product implementation
+	template<class T>
+	inline std::valarray<T> dot(const std::valarray<T>& v, const matrix<T>& mat) {//vector-matrix dot product implementation, returns ROW vector as a valarray
+		assert(v.size() == mat.get_m());
+
+		const auto _n = mat.get_n(); //return dim n
+		std::valarray<T> ret_data(_n);
+
+		T _val(0), j(0);
+
+		for (int i = 0; i < _n; ++i) {
+			j = 0;
+			_val = 0;
+			for (auto iter1 = std::begin(v); iter1 != std::end(v); ++iter1) {
+				_val += *iter1 * mat[j++][i];
+			}
+			ret_data[i] = _val;
+		}
+		return ret_data;
+	}
+
 	//matrix-vector dot product implementation
+	template<class T>
+	inline std::valarray<T> big_mat_dot(const matrix<T>& mat, const std::valarray<T>& v) { 	//matrix-vector dot product implementation, returns COLUMN vector as a valarray
+
+		assert(v.size() == mat.get_n());
+
+		const auto _m = mat.get_m(); //return dim m
+		std::valarray<T> ret_data(_m);
+
+		const auto mat_t = transpose(mat); // transpose to ease and speed up multiplication by reducing cache misses (hopefully)
+		for (int j = 0; j < _m; ++j) {
+			ret_data[j] = std::inner_product(std::begin(mat[j]), std::end(mat[j]), std::begin(v), T(0));
+		}
+		return ret_data;
+	}
+
 	template<class T>
 	inline std::valarray<T> dot(const matrix<T>& mat, const std::valarray<T>& v) { 	//matrix-vector dot product implementation, returns COLUMN vector as a valarray
 
@@ -401,7 +459,6 @@ namespace _matrix {
 		const auto _m = mat.get_m(); //return dim m
 		std::valarray<T> ret_data(_m);
 
-		const auto mat_t = transpose(mat); // transpose to ease and speed up multiplication by reducing cache misses (hopefully)
 		for (int j = 0; j < _m; ++j) {
 			ret_data[j] = std::inner_product(std::begin(mat[j]), std::end(mat[j]), std::begin(v), T(0));
 		}

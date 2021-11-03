@@ -425,7 +425,7 @@ int main13() {
 	return EXIT_SUCCESS;
 }
 
-int main14() {
+int main() {
 	stopwatch s;
 	random::init();
 
@@ -436,8 +436,7 @@ int main14() {
 	std::cout << "\nBrain ID: " << _c4_brain::c4_brain::get_current_ID() << std::endl;
 
 	//np_i_play_ai(&b, 5, random::randint(0,1));
-	//const char* const file_name("../_c4_brains/67333312_20_5_300_2_3_3_033__26_10_21.txt");
-	const char* const file_name("../_c4_brains/67333312_15_3_100_2_3_2_02__26_10_21.txt");
+	const char* const file_name("../_c4_brains/674412_15_3_100_2_3_2_02__26_10_21.txt");
 
 	b.store(file_name);
 
@@ -473,7 +472,7 @@ int main15() {
 	return EXIT_SUCCESS;
 }
 
-int main() {
+int main16() {
 
 	const char* const file_name1("../_c4_brains/67333312_15_3_100_2_3_2_02__26_10_21.txt");
 	auto b1 = _c4_brain::read(file_name1);

@@ -100,6 +100,9 @@ std::vector<_matrix::matrix<float>> _ga_nn::in_layer::forward_pass(const _matrix
 
 	for (int j = 0; j < y; ++j) {
 		for (int i = 0; i < x; ++i) {
+			/*
+			Create a no-alloc compatible matrix to solve this issue
+			*/
 			z = foo(nodes[j * x + i].forward_pass(std::valarray<float>(data(j, i), 1)));
 			for (unsigned int k = 0; k < ret.size(); ++k) {
 				ret[k](j, i) = z[k];
