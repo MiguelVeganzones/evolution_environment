@@ -373,16 +373,13 @@ namespace _matrix {
 
 		const auto _m = mat1.get_m(); //return dim m
 		const auto _n = mat2.get_n(); //return dim n
+		const auto _k = mat1.get_n(); //return inner dim k
 		std::vector<std::valarray<T>> ret_data(_m, std::valarray<T>(_n));
-		T _val(0), jj(0);
-		for (int j = 0; j < _m; ++j) {
-			for (int i = 0; i < _n; ++i) {
-				_val = 0;
-				jj = 0;
-				for (auto iter1 = std::begin(mat1[j]); iter1 != std::end(mat1[j]); ++iter1) {
-					_val += *iter1 * mat2[jj++][i];
+		for (int i = 0; i < _m; ++i) {
+			for (int k = 0; k < _k; ++k) {
+				for (int j = 0; j < _n; ++j) {
+					ret_data[i][j] += mat1(i, k) * mat2(k, j);
 				}
-				ret_data[j][i] = _val;
 			}
 		}
 		return ret_data;
@@ -424,13 +421,10 @@ namespace _matrix {
 
 		T _val(0), j(0);
 
-		for (int i = 0; i < _n; ++i) {
-			j = 0;
-			_val = 0;
-			for (auto iter1 = std::begin(v); iter1 != std::end(v); ++iter1) {
-				_val += *iter1 * mat[j++][i];
+		for (int i = 0; i < v.size(); ++i) {
+			for (int j = 0; j < _n ; ++j) {
+				ret_data[j] += v[i] * mat(i, j);
 			}
-			ret_data[i] = _val;
 		}
 		return ret_data;
 	}
