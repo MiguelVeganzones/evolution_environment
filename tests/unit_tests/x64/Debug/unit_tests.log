@@ -1,0 +1,3 @@
+﻿  unit_tests.cpp
+D:\proyects\c++\visual studio\evolution_environment\header files\ga_nn.h(174,43): warning C4267: 'return': conversion from 'size_t' to 'const uint_fast8_t', possible loss of data
+  unit_tests.vcxproj -> D:\proyects\c++\visual studio\evolution_environment\build\x64\Debug\unit_tests.dll

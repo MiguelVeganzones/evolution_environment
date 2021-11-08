@@ -1,0 +1,16 @@
+﻿  unit_tests.cpp
+D:\proyects\c++\visual studio\evolution_environment\header files\ga_nn.h(174,43): warning C4267: 'return': conversion from 'size_t' to 'const uint_fast8_t', possible loss of data
+D:\proyects\c++\visual studio\evolution_environment\tests\unit_tests\unit_tests.cpp(32,10): warning C4244: '*=': conversion from 'double' to 'unsigned int', possible loss of data
+D:\proyects\c++\visual studio\evolution_environment\tests\unit_tests\unit_tests.cpp(33,10): warning C4244: '*=': conversion from 'double' to 'unsigned int', possible loss of data
+D:\proyects\c++\visual studio\evolution_environment\tests\unit_tests\unit_tests.cpp(34,10): warning C4244: '*=': conversion from 'double' to 'unsigned int', possible loss of data
+D:\proyects\c++\visual studio\evolution_environment\tests\unit_tests\unit_tests.cpp(54,10): warning C4244: '*=': conversion from 'double' to 'unsigned int', possible loss of data
+D:\proyects\c++\visual studio\evolution_environment\tests\unit_tests\unit_tests.cpp(55,10): warning C4244: '*=': conversion from 'double' to 'unsigned int', possible loss of data
+D:\proyects\c++\visual studio\evolution_environment\tests\unit_tests\unit_tests.cpp(75,10): warning C4244: '*=': conversion from 'double' to 'unsigned int', possible loss of data
+D:\proyects\c++\visual studio\evolution_environment\tests\unit_tests\unit_tests.cpp(76,10): warning C4244: '*=': conversion from 'double' to 'unsigned int', possible loss of data
+     Creating library D:\proyects\c++\visual studio\evolution_environment\build\x64\Release\unit_tests.lib and object D:\proyects\c++\visual studio\evolution_environment\build\x64\Release\unit_tests.exp
+  Generating code
+  2 of 308 functions ( 0.6%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  unit_tests.vcxproj -> D:\proyects\c++\visual studio\evolution_environment\build\x64\Release\unit_tests.dll

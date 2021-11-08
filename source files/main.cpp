@@ -431,7 +431,7 @@ int main() {
 
 	const std::vector<uint_fast8_t> _shape({ 6, 7, 4, 4, 1, 2 });
 
-	auto b = _c4_evo_env::simulate_evolution(25, 7, 1000, _shape, 2, 3, 100, 4, 0.4, 30);
+	auto b = _c4_evo_env::simulate_evolution(15, 3, 100, _shape, 2, 3, 10, 2, 0.33, 10);
 
 	std::cout << "\nBrain ID: " << _c4_brain::c4_brain::get_current_ID() << std::endl;
 
