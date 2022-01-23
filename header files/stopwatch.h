@@ -3,15 +3,16 @@
 #include <iostream>
 #include <iomanip>
 
+
+//imeplement stopwatch::timeUnit
+//https://github.com/martinus/nanobench/blob/master/src/include/nanobench.h
+
 class stopwatch
 {
 public:
-    inline stopwatch()
-    {
-        start = std::chrono::steady_clock::now();
-    }
+    stopwatch() : start{ std::chrono::steady_clock::now() } {}
 
-    inline ~stopwatch()
+    ~stopwatch()
     {
         end = std::chrono::steady_clock::now();
         std::chrono::duration<double, std::micro> duration = end - start;

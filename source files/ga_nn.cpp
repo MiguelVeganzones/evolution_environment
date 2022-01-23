@@ -434,8 +434,8 @@ const std::pair<neural_net, neural_net> _ga_nn::crossover(const neural_net& net1
 	for (auto it = std::make_move_iterator(ret_nodes.begin()),
 		end = std::make_move_iterator(ret_nodes.end()); it != end; ++it) 
 	{
-		new_nodes1.push_back(it->first);
-		new_nodes2.push_back(it->second);
+		new_nodes1.push_back((*it).first);
+		new_nodes2.push_back((*it).second);
 	}
 
 	return std::make_pair(neural_net(_shape, std::move(new_nodes1)), neural_net(_shape, std::move(new_nodes2)));
@@ -592,7 +592,7 @@ std::ostream& _ga_nn::operator<<(std::ostream& os, const neural_net& nn)
 	return os;
 }
 
-bool _ga_nn::operator==(const neural_net& nn1, const neural_net& nn2)
+const bool _ga_nn::operator==(const neural_net& nn1, const neural_net& nn2)
 {
 	assert(nn1.get_shape() == nn2.get_shape());
 
@@ -629,7 +629,7 @@ bool _ga_nn::operator==(const neural_net& nn1, const neural_net& nn2)
 	return true;
 }
 
-bool _ga_nn::operator!=(const neural_net& nn1, const neural_net& nn2)
+const bool _ga_nn::operator!=(const neural_net& nn1, const neural_net& nn2)
 {
 	return  !(nn1 == nn2);
 }
@@ -688,7 +688,7 @@ double _ga_nn::d1_distance(const _ga_nn::neural_net& net1, const _ga_nn::neural_
 
 const _matrix::matrix<double> _ga_nn::population_variability(const std::vector<_ga_nn::neural_net*>& nets, const double null_case)
 {
-	const uint_fast8_t _size = nets.size();
+	const size_t _size = nets.size();
 	_matrix::matrix<double> distance_matrix(_size, _size, null_case);
 
 	double d_ij;
@@ -706,7 +706,7 @@ const _matrix::matrix<double> _ga_nn::population_variability(const std::vector<_
 
 const _matrix::matrix<double> _ga_nn::population_variability(const std::vector<std::reference_wrapper<_ga_nn::neural_net>>& nets, const double null_case)
 {
-	const uint_fast8_t _size = nets.size();
+	const size_t _size = nets.size();
 	_matrix::matrix<double> distance_matrix(_size, _size, null_case);
 
 	double d_ij;

@@ -425,18 +425,18 @@ int main13() {
 	return EXIT_SUCCESS;
 }
 
-int main() {
+int main14() {
 	stopwatch s;
 	random::init();
 
 	const std::vector<uint_fast8_t> _shape({ 6, 7, 4, 4, 1, 2 });
 
-	auto b = _c4_evo_env::simulate_evolution(15, 3, 100, _shape, 2, 3, 10, 2, 0.33, 10);
+	auto b = _c4_evo_env::simulate_evolution(15, 3, 100, _shape, 2, 3, 5, 2, 0.4, 10);
 
 	std::cout << "\nBrain ID: " << _c4_brain::c4_brain::get_current_ID() << std::endl;
 
 	//np_i_play_ai(&b, 5, random::randint(0,1));
-	const char* const file_name("../_c4_brains/674412_20_5_500_3_3_3_04__08_11_21.txt");
+	const char* const file_name("../_c4_brains/674412_25_7_500_3_3_4_04__08_11_21.txt");
 
 	b.store(file_name);
 
@@ -485,18 +485,9 @@ int main16() {
 	return EXIT_SUCCESS;
 }
 
-int main17() {
-	random::init();
-	_matrix::matrix<float> m1(random::randfloat, 0, 10, 10);
-	_matrix::matrix<float> m2(random::randfloat, 0, 10, 10);
 
-	std::valarray<float> v(10);
-	for(auto& e: v) e = random::randfloat();
 
-	std::cout << _matrix::d1_distance(_matrix::dot(m1, m2), _matrix::big_mat_dot(m1, m2)) << "\n";
-	for (auto e : _matrix::dot(v, m2) - _matrix::big_mat_dot(v, m2)) std::cout << e << " ";
-	std::cout << std::endl;
-	for (auto e : _matrix::dot(m1, v) - _matrix::big_mat_dot(m1, v)) std::cout << e << " ";
-
+int main() {
+	main14();
 	return EXIT_SUCCESS;
 }

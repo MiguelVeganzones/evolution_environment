@@ -11,10 +11,10 @@ namespace _c4_brain {
 		std::atomic<uint_fast16_t> wins = 0;
 		std::atomic<uint_fast16_t> losses = 0;
 		std::atomic<uint_fast16_t> ties = 0;
-		uint_fast16_t ID = ++s_ID;
+		uint_fast32_t ID = ++s_ID;
 		std::vector<uint_fast8_t> shape;
 //static variable
-		static uint_fast16_t s_ID;
+		static uint_fast32_t s_ID;
 
 	public:
 		c4_brain(const std::vector<uint_fast8_t>& _shape);
@@ -23,7 +23,7 @@ namespace _c4_brain {
 		c4_brain(c4_brain&& other) noexcept;
 
 		uint_fast8_t weigh(const board& current_board, const bool player) const;
-		//inline static uint_fast8_t s_weigh(const _c4_brain::c4_brain& b, const board& _board) { return b.weigh(_board); }
+		//static uint_fast8_t s_weigh(const _c4_brain::c4_brain& b, const board& _board) { return b.weigh(_board); }
 
 		inline void won() { ++wins; }
 		inline void lost() { ++losses; }
@@ -39,7 +39,7 @@ namespace _c4_brain {
 		void print_stats() const;
 		void inline reset() { wins = 0; losses = 0; ties = 0; }
 
-		static inline uint_fast16_t get_current_ID() { return s_ID; }
+		static inline uint_fast32_t get_current_ID() { return s_ID; }
 
 		void mutate(float p = 0.1f, float avg = 0.f, float stddev = 0.1f);
 		void store(const char* const file_name) const;
@@ -56,5 +56,5 @@ namespace _c4_brain {
 	_c4_brain::c4_brain read(const char* const file_name);
 
 	std::ostream& operator <<(std::ostream& os, const _c4_brain::c4_brain& brain);
-	inline bool operator == (const c4_brain& b1, const c4_brain& b2) { return b1.get_net() == b2.get_net(); }
+	inline const bool operator == (const c4_brain& b1, const c4_brain& b2) { return b1.get_net() == b2.get_net(); }
 }

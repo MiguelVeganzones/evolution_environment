@@ -20,8 +20,8 @@ namespace _ga_nn {
 		inline node() : inputs{}, outputs{}, weights{}{};
 		node(const uint_fast8_t _inputs, const uint_fast8_t _outputs);
 		node(const _matrix::matrix<float>& _weights);
-		inline node(node&&) = default;
-		inline node(const node&) = default;
+		node(node&&) = default;
+		node(const node&) = default;
 
 		inline node& operator=(const node&) = default;
 
@@ -39,17 +39,17 @@ namespace _ga_nn {
 		void set(const _matrix::matrix<float>& new_weights);
 		//void store(const char* const file_name) const;
 
-		friend bool operator==(const node& n1, const node& n2);
-		friend bool operator!=(const node& n1, const node& n2);
+		friend const bool operator==(const node& n1, const node& n2);
+		friend const bool operator!=(const node& n1, const node& n2);
 
-		inline ~node() = default;
+		~node() = default;
 	};
 
-	inline bool operator==(const node& n1, const node& n2) {
+	inline const bool operator==(const node& n1, const node& n2) {
 		return n1.weights == n2.weights;
 	}
 
-	inline bool operator!=(const node& n1, const node& n2) {
+	inline const bool operator!=(const node& n1, const node& n2) {
 		return n1.get() == n2.get();
 	}
 
@@ -75,7 +75,7 @@ namespace _ga_nn {
 
 		void mutate(float p, float avg, float stddev);
 
-		inline ~layer() = default;
+		virtual ~layer() = default;
 	};
 
 	class in_layer : public layer {
@@ -95,7 +95,7 @@ namespace _ga_nn {
 		std::vector<_matrix::matrix<float>> forward_pass(const _matrix::matrix<float>& data,
 			std::valarray<float>(*foo)(const std::valarray<float>&) = _nn_func::equality) const;
 
-		inline ~in_layer() = default;
+		~in_layer() = default;
 	};
 
 	class hidden_layer : public layer {
@@ -121,7 +121,7 @@ namespace _ga_nn {
 		std::vector<_matrix::matrix<float>> forward_pass(const std::vector<_matrix::matrix<float>>& data,
 			std::valarray<float>(*foo)(const std::valarray<float>&) = _nn_func::relu) const;
 
-		inline ~hidden_layer() = default;
+		~hidden_layer() = default;
 	};
 
 	class out_layer : public layer {
@@ -144,7 +144,7 @@ namespace _ga_nn {
 		std::valarray<float> forward_pass(const std::vector<_matrix::matrix<float>>& data,
 			std::valarray<float>(*foo)(const std::valarray<float>&) = _nn_func::softmax) const;
 
-		inline ~out_layer() = default;
+		~out_layer() = default;
 	};
 
 	class neural_net {
@@ -171,7 +171,7 @@ namespace _ga_nn {
 		inline std::vector<std::unique_ptr<hidden_layer>>& get_hidden() { return p_hidden; }
 		inline std::unique_ptr<out_layer>& get_tail() { return p_tail; }
 
-		inline const uint_fast8_t depth() const { return p_hidden.size() + 1; }
+		inline const size_t depth() const { return p_hidden.size() + 1; }
 		const uint_fast16_t parameter_count() const;
 
 		std::valarray<float> forard_pass(const _matrix::matrix<float>& data) const;
@@ -181,12 +181,12 @@ namespace _ga_nn {
 
 		//friend operators
 		friend std::ostream& operator<<(std::ostream& os, const neural_net& nn);
-		friend bool operator == (const neural_net& nn1, const neural_net& nn2);
-		friend bool operator != (const neural_net& nn1, const neural_net& nn2);
+		friend const bool operator == (const neural_net& nn1, const neural_net& nn2);
+		friend const bool operator != (const neural_net& nn1, const neural_net& nn2);
 	};
 
-	bool operator == (const neural_net& nn1, const neural_net& nn2);
-	bool operator != (const neural_net& nn1, const neural_net& nn2);
+	bool const operator == (const neural_net& nn1, const neural_net& nn2);
+	bool const operator != (const neural_net& nn1, const neural_net& nn2);
 
 	const neural_net mutation(const neural_net& net);
 

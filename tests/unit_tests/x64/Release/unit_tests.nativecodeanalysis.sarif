@@ -1,0 +1,312 @@
+{
+  "version": "2.1.0",
+  "$schema": "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json",
+  "runs": [
+    {
+      "results": [
+        {
+          "ruleId": "C26451",
+          "message": {
+            "text": "Arithmetic overflow: Using operator '+' on a 4 byte value and then casting the result to a 8 byte value. Cast the value to the wider type before calling operator '+' to avoid overflow (io.2)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/proyects/c++/visual studio/evolution_environment/header files/board.h"
+                },
+                "region": {
+                  "startLine": 35,
+                  "startColumn": 22,
+                  "endLine": 35,
+                  "endColumn": 31
+                }
+              },
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "board::()",
+                  "decoratedName": "??Rboard@@QEBACEE@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "ruleId": "C26451",
+          "message": {
+            "text": "Arithmetic overflow: Using operator '*' on a 4 byte value and then casting the result to a 8 byte value. Cast the value to the wider type before calling operator '*' to avoid overflow (io.2)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/proyects/c++/visual studio/evolution_environment/header files/board.h"
+                },
+                "region": {
+                  "startLine": 35,
+                  "startColumn": 22,
+                  "endLine": 35,
+                  "endColumn": 26
+                }
+              },
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "board::()",
+                  "decoratedName": "??Rboard@@QEBACEE@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "ruleId": "C26451",
+          "message": {
+            "text": "Arithmetic overflow: Using operator '+' on a 4 byte value and then casting the result to a 8 byte value. Cast the value to the wider type before calling operator '+' to avoid overflow (io.2)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/proyects/c++/visual studio/evolution_environment/header files/board.h"
+                },
+                "region": {
+                  "startLine": 35,
+                  "startColumn": 45,
+                  "endLine": 35,
+                  "endColumn": 54
+                }
+              },
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "board::()",
+                  "decoratedName": "??Rboard@@QEBACEE@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "ruleId": "C26451",
+          "message": {
+            "text": "Arithmetic overflow: Using operator '*' on a 4 byte value and then casting the result to a 8 byte value. Cast the value to the wider type before calling operator '*' to avoid overflow (io.2)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/proyects/c++/visual studio/evolution_environment/header files/board.h"
+                },
+                "region": {
+                  "startLine": 35,
+                  "startColumn": 45,
+                  "endLine": 35,
+                  "endColumn": 49
+                }
+              },
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "board::()",
+                  "decoratedName": "??Rboard@@QEBACEE@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "tool": {
+        "driver": {
+          "name": "PREfast",
+          "fullName": "PREfast Code Analysis",
+          "version": "14.30.30705.0",
+          "informationUri": "https://aka.ms/cpp/ca"
+        }
+      },
+      "invocations": [
+        {
+          "commandLine": "\"E:\\Programas E\\visual studio 2022_release\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\c1xx.dll\" -ACf{1F7B090C-16DB-4822-966A-A93D26ED4681} -ACpmspft140.dll -Alint -D_PREFAST_ -D_AST_FE_ -Analyze -zm0x00007FF777590C80 -allChunksReserved -il C:\\Users\\vegan\\AppData\\Local\\Temp\\_CL_344d0fa2ast -typedil -f unit_tests.cpp -Ze -D_MSC_EXTENSIONS -Zp16 -pc \\:/ -D_MSC_VER=1930 -D_MSC_FULL_VER=193030705 -D_MSC_BUILD=0 -D_M_AMD64=100 -ZILP448 -D_M_X64=100 -D_WIN64 -D_WIN32 -GR -D_CPPRTTI -I D:\\proyects\\c++\\visual studio\\evolution_environment\\resources -I D:\\proyects\\c++\\visual studio\\evolution_environment\\source files -I D:\\proyects\\c++\\visual studio\\evolution_environment\\header files -nologo -W 3 -diagnostics:column -D_GUARDOVERFLOW_CRT_ALLOCATORS=1 -GF -Og -Ot -Oy -Oi -ltcg -DCODE_ANALYSIS -DNDEBUG -D_WINDLL -D_UNICODE -DUNICODE -EHs -D_CPPUNWIND -EHc -MD -D_MT -D_DLL -GS -D_M_FP_PRECISE -Zc:wchar_t -Zc:forScope -Yupch.h -Fpx64\\Release\\unit_tests.pch -Fox64\\Release\\unit_tests.obj -Fdx64\\Release\\vc143.pdb -external:W 3 -Gd -analyze:projectdirectory D:\\proyects\\c++\\visual studio\\evolution_environment\\tests\\unit_tests -analyze:rulesetdirectory ;E:\\Programas E\\visual studio 2022_release\\Team Tools\\Static Analysis Tools\\\\Rule Sets; -analyze:ruleset E:\\Programas E\\visual studio 2022_release\\Team Tools\\Static Analysis Tools\\Rule Sets\\NativeRecommendedRules.ruleset -analyze:quiet -analyze:plugin E:\\Programas E\\visual studio 2022_release\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\EspXEngine.dll -FC -errorreport:prompt -I E:\\Programas E\\visual studio 2022_release\\VC\\Tools\\MSVC\\14.30.30705\\include -I E:\\Programas E\\visual studio 2022_release\\VC\\Tools\\MSVC\\14.30.30705\\atlmfc\\include -I E:\\Programas E\\visual studio 2022_release\\VC\\Auxiliary\\VS\\include -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\ucrt -I E:\\Programas E\\visual studio 2022_release\\VC\\Auxiliary\\VS\\UnitTest\\include -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\um -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\shared -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\winrt -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\cppwinrt -I D:\\proyects\\c++\\visual studio\\evolution_environment\\tests\\unit_tests\\Include\\um -external:I E:\\Programas E\\visual studio 2022_release\\VC\\Tools\\MSVC\\14.30.30705\\include -I E:\\Programas E\\visual studio 2022_release\\VC\\Tools\\MSVC\\14.30.30705\\include -external:I E:\\Programas E\\visual studio 2022_release\\VC\\Tools\\MSVC\\14.30.30705\\atlmfc\\include -I E:\\Programas E\\visual studio 2022_release\\VC\\Tools\\MSVC\\14.30.30705\\atlmfc\\include -external:I E:\\Programas E\\visual studio 2022_release\\VC\\Auxiliary\\VS\\include -I E:\\Programas E\\visual studio 2022_release\\VC\\Auxiliary\\VS\\include -external:I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\ucrt -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\ucrt -external:I E:\\Programas E\\visual studio 2022_release\\VC\\Auxiliary\\VS\\UnitTest\\include -I E:\\Programas E\\visual studio 2022_release\\VC\\Auxiliary\\VS\\UnitTest\\include -external:I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\um -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\um -external:I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\shared -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\shared -external:I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\winrt -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\winrt -external:I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\cppwinrt -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\cppwinrt -external:I D:\\proyects\\c++\\visual studio\\evolution_environment\\tests\\unit_tests\\Include\\um -I D:\\proyects\\c++\\visual studio\\evolution_environment\\tests\\unit_tests\\Include\\um",
+          "executionSuccessful": true
+        }
+      ],
+      "artifacts": [
+        {
+          "location": {
+            "uri": "file:///D:/proyects/c++/visual studio/evolution_environment/header files/board.h"
+          },
+          "roles": [
+            "resultFile"
+          ],
+          "hashes": {
+            "sha-256": "93a693929e56a1f4136ac73da8deafce8865b44a6d766af1f3024abb5c5c7232"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///d:/proyects/c++/visual studio/evolution_environment/tests/unit_tests/unit_tests.cpp"
+          },
+          "roles": [
+            "analysisTarget"
+          ],
+          "hashes": {
+            "sha-256": "cbfc88a7d4cda57d5bb2b9f4bcdcd27dc7bdfc4a1a2142bb2d3eedf71e9b93fa"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///d:/proyects/c++/visual studio/evolution_environment/tests/unit_tests/pch.h"
+          },
+          "hashes": {
+            "sha-256": "7e9de1274d4f70a1d691a27a2b83c598aa48de9677bc8c9edff2e07675464bec"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///e:/programas e/visual studio 2022_release/vc/auxiliary/vs/unittest/include/cppunittest.h"
+          },
+          "hashes": {
+            "sha-256": "1378b2fc1fa8cda7a282ddbb3bdd47778c995dde124701e01d2d74330d752fc7"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///e:/programas e/visual studio 2022_release/vc/auxiliary/vs/unittest/include/cppunittestcommon.h"
+          },
+          "hashes": {
+            "sha-256": "9a8f906c1baf61c9d28bbdd3855bc24196b36727dd8b4f243f03f78ab4763dbd"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///e:/programas e/visual studio 2022_release/vc/auxiliary/vs/unittest/include/cppunittestassert.h"
+          },
+          "hashes": {
+            "sha-256": "8aa38d7301abc47cb999eead2eb764365d1a7d893b05e1b98ddcf41c42dc919c"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///e:/programas e/visual studio 2022_release/vc/auxiliary/vs/unittest/include/cppunittestlogger.h"
+          },
+          "hashes": {
+            "sha-256": "c0715b1e3db28155d7a0d45e601fd72bdd80495ae0ddcad5654f8f1ef4048cb4"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///d:/proyects/c++/visual studio/evolution_environment/header files/c4_evo_environment.h"
+          },
+          "hashes": {
+            "sha-256": "5b7318bb03d3746b07971ec6633895364dbffe188c9119e17afe20d2ca69a603"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///d:/proyects/c++/visual studio/evolution_environment/header files/ga_nn.h"
+          },
+          "hashes": {
+            "sha-256": "d764c4154c0516dd1d828e0fb97db4b2100ae1210daa23a77b12e5870e52c29a"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///d:/proyects/c++/visual studio/evolution_environment/header files/small_ga_matrix.h"
+          },
+          "hashes": {
+            "sha-256": "42a388d590e4c05017cff0f404a8b2927f9a5f6a4a2daf61c56b82d2ddfbbc4b"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///d:/proyects/c++/visual studio/evolution_environment/header files/random.h"
+          },
+          "hashes": {
+            "sha-256": "bc61b8387b8237a689fa3c4c7017620b1869d00ac3f58237e41b077ff390144d"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///d:/proyects/c++/visual studio/evolution_environment/header files/nn_helper_functions.h"
+          },
+          "hashes": {
+            "sha-256": "4511960136f74ad98e3f79e1a735542311280a0d304885b06e1075c731416858"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///d:/proyects/c++/visual studio/evolution_environment/header files/non_parallel_minimax.h"
+          },
+          "hashes": {
+            "sha-256": "bc22c7e60d1ccecd96fa1384f71d5541584227c58787a81ea5c3e180c6e898af"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///d:/proyects/c++/visual studio/evolution_environment/resources/parallel_hashmap/phmap.h"
+          },
+          "hashes": {
+            "sha-256": "6473694afe5ed388c8b637d360b3655c7f5a94d4d679a37f4acdfca42a7a06a9"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///d:/proyects/c++/visual studio/evolution_environment/resources/parallel_hashmap/phmap_fwd_decl.h"
+          },
+          "hashes": {
+            "sha-256": "0c6e35b23080a2c0ac686ab47cd68479bf5a5ec0590d7d72b71715bcc63c1ff2"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///d:/proyects/c++/visual studio/evolution_environment/resources/parallel_hashmap/phmap_utils.h"
+          },
+          "hashes": {
+            "sha-256": "d0ae0c076a020289a42f7d95f97ce0aaf5988cab057d282729c271ec78dc6dfe"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///d:/proyects/c++/visual studio/evolution_environment/resources/parallel_hashmap/phmap_bits.h"
+          },
+          "hashes": {
+            "sha-256": "6d971498df225bb2af1c1ab7421d0b012d1bc37a88092ec472dccd72783cba7e"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///d:/proyects/c++/visual studio/evolution_environment/resources/parallel_hashmap/phmap_config.h"
+          },
+          "hashes": {
+            "sha-256": "9e95c4efc5dd150c9f4ad865961ddcbf57fa600869d4fdbbe94f39fe457c7062"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///d:/proyects/c++/visual studio/evolution_environment/resources/parallel_hashmap/phmap_base.h"
+          },
+          "hashes": {
+            "sha-256": "a3b3343d74d9d7c4a8d7f56554f48a4990eabaf6dc55f1b4dc424acdc0cefa78"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///d:/proyects/c++/visual studio/evolution_environment/header files/c4_brain.h"
+          },
+          "hashes": {
+            "sha-256": "46a71ca506d59d992fb46ce060131aa03d35e42315c7d7a42b141ebc55dec285"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///d:/proyects/c++/visual studio/evolution_environment/source files/random.cpp"
+          },
+          "hashes": {
+            "sha-256": "f8bc084c224a90a0559fb7e1b8da11b0eef5f528c60d8718e80b75d6decfd7b1"
+          }
+        }
+      ]
+    }
+  ]
+}

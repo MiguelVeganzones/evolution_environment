@@ -16,7 +16,7 @@ static uint64_t np_count = 0;
 
 static constexpr const std::array<uint_fast8_t, 2> next_player{ 1, 0 };
 
-inline void np_print_vector_pair(const std::vector<std::pair<uint_fast8_t, uint_fast8_t>>& v)
+void np_print_vector_pair(const std::vector<std::pair<uint_fast8_t, uint_fast8_t>>& v)
 {
 	for (auto& elem : v)
 	{
@@ -66,7 +66,7 @@ uint_fast8_t np_c4_minimax(const board& prev_board, const _c4_brain::c4_brain* b
 	return ret;
 }
 
-inline uint_fast8_t np_insert_and_return(const std::pair<uint64_t, uint64_t> num_cur_board,
+uint_fast8_t np_insert_and_return(const std::pair<uint64_t, uint64_t> num_cur_board,
 	const uint_fast8_t weight)
 {
 	np_computed_boards.insert({ num_cur_board, weight });

@@ -3,19 +3,20 @@
 #include "non_parallel_minimax.h"
 #include <cmath>
 #include <execution>
+#include "stopwatch.h"
 
 std::vector<_c4_brain::c4_brain*> _c4_evo_env::selection_operator(const std::vector<_c4_brain::c4_brain*>& brains,
 	std::valarray<double>&& _winrate, float alpha, uint_fast8_t n)
 {
 	assert(brains.size() == winrate.size());
-	const uint_fast8_t _size = brains.size();
+	const size_t _size = brains.size();
 
 	std::vector<uint_fast8_t> _parents(n);
 
 	const _matrix::matrix<double> variability_matrix = _c4_brain::population_variability(brains);
 	std::valarray<double> weight_vector(_size);
 
-	uint_fast8_t i, j, _index;
+	uint_fast8_t i, _index;
 
 	_index = std::distance(std::begin(_winrate), std::max_element(std::begin(_winrate), std::end(_winrate))); //index of max winrate
 	_parents[0] = _index;
@@ -133,7 +134,6 @@ const _c4_brain::c4_brain _c4_evo_env::simulate_evolution_helper(std::vector<_c4
 
 	//competition and breeding
 	for (i = 0; i < epochs; ++i) {
-
 		tournament(gen[gi[0]], gen[gi[1]], prev_depth, cur_depth);
 
 		for (j = 0; j < pop_size; ++j) {
@@ -191,7 +191,7 @@ const _c4_brain::c4_brain _c4_evo_env::simulate_evolution_helper(std::vector<_c4
 		//}
 
 		if ((i % control_epochs) == 0) {
-			std::cout << "\nPopulation variability: \n" << _c4_brain::population_variability(gen[gi[1]]);
+			if (epochs < 25) std::cout << "\nPopulation variability: \n" << _c4_brain::population_variability(gen[gi[1]]);
 			std::cout << "\nControl tournament: " << std::endl;
 			check_progress(control_gen, gen[gi[1]], cur_depth);
 		}
@@ -260,26 +260,26 @@ void _c4_evo_env::check_progress(const std::vector<_c4_brain::c4_brain*>& contro
 	tournament(control_group, cur_gen, depth, depth);
 
 	uint_fast8_t n = cur_gen.size();
-	std::vector<float> f(n); //fitness
+	std::vector<float> fitness(n); //fitness
 
 	for (int i = 0; i < n; ++i) {
 		//std::cout << "Brain " << i << " winrate: " << (w[i] = (cur_gen[i]->get_winrate())) << "\n";
-		f[i] = (cur_gen[i]->get_fitness());
+		fitness[i] = (cur_gen[i]->get_fitness());
 	}
 
 	float m = 0, s = 0; //mu and sigma
-	for (auto e : f) { m += e; }
+	for (const float e : fitness) { m += e; }
 	m /= n;
 	
 	float temp = 0;
-	for (auto e : f) {
+	for (auto e : fitness) {
 		temp += pow(e - m, 2);
 	}
 
 	s = sqrt(temp / (n - 1));
 
-	std::cout << "Best performance: " << *std::max_element(f.begin(), f.end()) <<
-		"\nWorst performance: " << *std::min_element(f.begin(), f.end()) <<
+	std::cout << "Best performance: " << *std::max_element(fitness.begin(), fitness.end()) <<
+		"\nWorst performance: " << *std::min_element(fitness.begin(), fitness.end()) <<
 		"\nThe data fits a normal distribution N(" << m << ", " << s << ")\n";
 
 	//for (const auto& e : cur_gen) {

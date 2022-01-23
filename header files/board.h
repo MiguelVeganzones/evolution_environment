@@ -16,7 +16,7 @@ using namespace b_const;
 struct board
 {
 	board() {}
-	inline board(const std::array<uint_fast8_t, size>& arr) 
+	board(const std::array<uint_fast8_t, size>& arr) 
 	{
 		for (uint_fast8_t i = 0; i < size; ++i)
 		{
@@ -25,7 +25,7 @@ struct board
 		}
 	}
 
-	inline board(const board& board, const uint_fast8_t move, const uint_fast8_t player) :state{ board.state }
+	board(const board& board, const uint_fast8_t move, const uint_fast8_t player) :state{ board.state }
 	{
 		state[player][move] = true;
 	}

@@ -1,0 +1,44 @@
+{
+  "version": "2.1.0",
+  "$schema": "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json",
+  "runs": [
+    {
+      "results": [],
+      "tool": {
+        "driver": {
+          "name": "PREfast",
+          "fullName": "PREfast Code Analysis",
+          "version": "14.30.30705.0",
+          "informationUri": "https://aka.ms/cpp/ca"
+        }
+      },
+      "invocations": [
+        {
+          "commandLine": "\"E:\\Programas E\\visual studio 2022_release\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\c1xx.dll\" -ACf{1F7B090C-16DB-4822-966A-A93D26ED4681} -ACpmspft140.dll -Alint -D_PREFAST_ -D_AST_FE_ -Analyze -zm0x00007FF777590C80 -il C:\\Users\\vegan\\AppData\\Local\\Temp\\_CL_6e62323east -typedil -f pch.cpp -Ze -D_MSC_EXTENSIONS -Zp16 -pc \\:/ -D_MSC_VER=1930 -D_MSC_FULL_VER=193030705 -D_MSC_BUILD=0 -D_M_AMD64=100 -ZILP448 -D_M_X64=100 -D_WIN64 -D_WIN32 -GR -D_CPPRTTI -I D:\\proyects\\c++\\visual studio\\evolution_environment\\resources -I D:\\proyects\\c++\\visual studio\\evolution_environment\\source files -I D:\\proyects\\c++\\visual studio\\evolution_environment\\header files -nologo -W 3 -diagnostics:column -D_GUARDOVERFLOW_CRT_ALLOCATORS=1 -GF -Og -Ot -Oy -Oi -ltcg -DCODE_ANALYSIS -DNDEBUG -D_WINDLL -D_UNICODE -DUNICODE -EHs -D_CPPUNWIND -EHc -MD -D_MT -D_DLL -GS -D_M_FP_PRECISE -Zc:wchar_t -Zc:forScope -Ycpch.h -Fpx64\\Release\\unit_tests.pch -Fox64\\Release\\pch.obj -Fdx64\\Release\\vc143.pdb -external:W 3 -Gd -analyze:projectdirectory D:\\proyects\\c++\\visual studio\\evolution_environment\\tests\\unit_tests -analyze:rulesetdirectory ;E:\\Programas E\\visual studio 2022_release\\Team Tools\\Static Analysis Tools\\\\Rule Sets; -analyze:ruleset E:\\Programas E\\visual studio 2022_release\\Team Tools\\Static Analysis Tools\\Rule Sets\\NativeRecommendedRules.ruleset -analyze:quiet -analyze:plugin E:\\Programas E\\visual studio 2022_release\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\EspXEngine.dll -FC -errorreport:prompt -I E:\\Programas E\\visual studio 2022_release\\VC\\Tools\\MSVC\\14.30.30705\\include -I E:\\Programas E\\visual studio 2022_release\\VC\\Tools\\MSVC\\14.30.30705\\atlmfc\\include -I E:\\Programas E\\visual studio 2022_release\\VC\\Auxiliary\\VS\\include -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\ucrt -I E:\\Programas E\\visual studio 2022_release\\VC\\Auxiliary\\VS\\UnitTest\\include -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\um -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\shared -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\winrt -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\cppwinrt -I D:\\proyects\\c++\\visual studio\\evolution_environment\\tests\\unit_tests\\Include\\um -external:I E:\\Programas E\\visual studio 2022_release\\VC\\Tools\\MSVC\\14.30.30705\\include -I E:\\Programas E\\visual studio 2022_release\\VC\\Tools\\MSVC\\14.30.30705\\include -external:I E:\\Programas E\\visual studio 2022_release\\VC\\Tools\\MSVC\\14.30.30705\\atlmfc\\include -I E:\\Programas E\\visual studio 2022_release\\VC\\Tools\\MSVC\\14.30.30705\\atlmfc\\include -external:I E:\\Programas E\\visual studio 2022_release\\VC\\Auxiliary\\VS\\include -I E:\\Programas E\\visual studio 2022_release\\VC\\Auxiliary\\VS\\include -external:I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\ucrt -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\ucrt -external:I E:\\Programas E\\visual studio 2022_release\\VC\\Auxiliary\\VS\\UnitTest\\include -I E:\\Programas E\\visual studio 2022_release\\VC\\Auxiliary\\VS\\UnitTest\\include -external:I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\um -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\um -external:I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\shared -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\shared -external:I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\winrt -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\winrt -external:I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\cppwinrt -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\cppwinrt -external:I D:\\proyects\\c++\\visual studio\\evolution_environment\\tests\\unit_tests\\Include\\um -I D:\\proyects\\c++\\visual studio\\evolution_environment\\tests\\unit_tests\\Include\\um",
+          "executionSuccessful": true
+        }
+      ],
+      "artifacts": [
+        {
+          "location": {
+            "uri": "file:///d:/proyects/c++/visual studio/evolution_environment/tests/unit_tests/pch.cpp"
+          },
+          "roles": [
+            "analysisTarget"
+          ],
+          "hashes": {
+            "sha-256": "b1dfc417ce748ffeec95311109dae13142c638e58cfa86eb6e5a0865082428aa"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///d:/proyects/c++/visual studio/evolution_environment/tests/unit_tests/pch.h"
+          },
+          "hashes": {
+            "sha-256": "7e9de1274d4f70a1d691a27a2b83c598aa48de9677bc8c9edff2e07675464bec"
+          }
+        }
+      ]
+    }
+  ]
+}

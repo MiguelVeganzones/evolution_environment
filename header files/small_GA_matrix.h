@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------
 //
-// header only and inline declarations due to templeted class
+// header only declarations due to templeted class
 // 
 //----------------------------------------------------------------------
 
@@ -35,7 +35,7 @@ namespace _matrix {
 
 	public:
 		//default ctor
-		inline matrix(const uint_fast8_t _m = 1, const uint_fast8_t _n = 1, const T _default = T(0)) :
+		matrix(const uint_fast8_t _m = 1, const uint_fast8_t _n = 1, const T _default = T(0)) :
 			m{ _m }, n{ _n } {
 			assert(m != 0 && n != 0);
 			data.resize(m);
@@ -44,10 +44,10 @@ namespace _matrix {
 			}
 		}
 
-		inline matrix<T>(const matrix<T>&) = default;
-		inline matrix<T>(matrix<T>&&) = default;
+		matrix<T>(const matrix<T>&) = default;
+		matrix<T>(matrix<T>&&) = default;
 
-		inline matrix(T(*foo)(), const float offset = 0, const uint_fast8_t _m = 1, const uint_fast8_t _n = 1) :
+		matrix(T(*foo)(), const float offset = 0, const uint_fast8_t _m = 1, const uint_fast8_t _n = 1) :
 			m{ _m }, n{ _n } {
 			assert(m != 0 && n != 0);
 			data.resize(m);
@@ -57,18 +57,18 @@ namespace _matrix {
 			}
 		}
 
-		inline matrix(const std::vector<std::valarray<T>>& _data) :
+		matrix(const std::vector<std::valarray<T>>& _data) :
 			m{ (uint_fast8_t)_data.size() }, n{ (uint_fast8_t)_data[0].size() }, data{ _data }{
 
 		}
 
 		//row vector ctor
-		inline matrix(const std::valarray<T>& _data) :
+		matrix(const std::valarray<T>& _data) :
 			m{ (uint_fast8_t)_data.size() }, n{ 1 }, data{ std::vector<std::valarray<T>>(1, std::valarray<T>(_data)) }{
 
 		}
 
-		inline matrix(const matrix<T>& mat1, const matrix<T>& mat2) :
+		matrix(const matrix<T>& mat1, const matrix<T>& mat2) :
 			m{ uint_fast8_t(mat1.get_m() + mat2.get_m()) }, n{ mat1.get_n() }{
 			assert(mat1.get_n() == mat2.get_n());
 
@@ -88,7 +88,7 @@ namespace _matrix {
 			}
 		}
 
-		inline matrix<T>& operator=(const matrix<T>& other) {
+		matrix<T>& operator=(const matrix<T>& other) {
 			if (this == &other)
 				return *this;
 			m = other.get_m();
@@ -122,7 +122,7 @@ namespace _matrix {
 		}
 
 		//read only slicing operator
-		inline const matrix<T> operator[](const std::array<uint_fast8_t, 2> slice_index) const {
+		const matrix<T> operator[](const std::array<uint_fast8_t, 2> slice_index) const {
 			uint_fast8_t a = slice_index[0], b = slice_index[1];
 			assert(a < m&& b <= m && a < b);
 
@@ -136,14 +136,14 @@ namespace _matrix {
 		//--------
 		//utility
 		//--------
-		inline void populate(T(*foo)(), const T scale = 1, const T offset = 0) {
+		void populate(T(*foo)(), const T scale = 1, const T offset = 0) {
 			for (int i = 0; i < m; ++i)
 				for (int j = 0; j < n; ++j)
 					data[i][j] = foo();
 		}
 
 		//mutate the elements of the matrix
-		inline void mutate(T(*randnormal)(float, float), const float p, const float avg = 0, const float stddev = 1) {
+		void mutate(T(*randnormal)(float, float), const float p, const float avg = 0, const float stddev = 1) {
 			for (int i = 0; i < m; ++i)
 				for (int j = 0; j < n; ++j)
 					data[i][j] += randnormal(avg, stddev) * (random::randfloat() < p);
@@ -157,11 +157,11 @@ namespace _matrix {
 		inline constexpr const uint_fast8_t get_n() const { return n; }
 
 		//write access to data
-		void set(const std::vector<std::valarray<T>>& _data) {
+		inline void set(const std::vector<std::valarray<T>>& _data) {
 			data = _data;
 		}
 
-		inline matrix<T> operator *(const matrix<T>& other) const {//elementwise multiplication
+		const matrix<T> operator *(const matrix<T>& other) const {//elementwise multiplication
 			assert(n == other.get_n() && m == other.get_m());
 
 			std::vector<std::valarray<T>> ret_data(m, std::valarray<T>(n));
@@ -172,7 +172,7 @@ namespace _matrix {
 			return ret_data;
 		}
 
-		inline matrix<T> operator *(const T& p) const {//elementwise multiplication
+		const matrix<T> operator *(const T& p) const {//elementwise multiplication
 
 			std::vector<std::valarray<T>> ret_data(m, std::valarray<T>(n));
 
@@ -185,7 +185,7 @@ namespace _matrix {
 		template<class T>
 		friend std::ostream& operator<<(std::ostream& os, const matrix<T>& mat);
 
-		inline void store_csv(const char* const file_name) const {
+		void store_csv(const char* const file_name) const {
 			//std::ofstream out(file_name);
 
 			std::fstream out;
@@ -203,7 +203,7 @@ namespace _matrix {
 		}
 
 		//default dtor as no dynamic memory is used
-		inline ~matrix() {};
+		~matrix() {};
 	};
 
 	//------------------------------------------------
@@ -214,7 +214,7 @@ namespace _matrix {
 
 	//measure diference between two matrices
 	template<class T>
-	inline double d1_distance(const matrix<T>& mat1, const matrix<T>& mat2) {
+	double d1_distance(const matrix<T>& mat1, const matrix<T>& mat2) {
 		assert(mat1.get_m() == mat2.get_m() && mat1.get_n() == mat2.get_n());
 
 		double _distance = 0;
@@ -225,7 +225,7 @@ namespace _matrix {
 	}
 
 	template<class T>
-	inline matrix<T> eye(const uint_fast8_t m) {
+	matrix<T> eye(const uint_fast8_t m) {
 		matrix mat(m, m, 0);
 		for (int i = 0; i < m; ++i) {
 			mat(i, i) = 1;
@@ -241,7 +241,7 @@ namespace _matrix {
 	/// <param name="v"></param>
 	/// <returns></returns>
 	template<class T>
-	inline matrix<T> custom_eye(const uint_fast8_t m, const std::vector<uint_fast8_t>& v) {
+	matrix<T> custom_eye(const uint_fast8_t m, const std::vector<uint_fast8_t>& v) {
 		assert(m == v.size());
 		matrix mat(m, m, 0);
 		for (int i = 0; i < m; ++i) {
@@ -251,7 +251,7 @@ namespace _matrix {
 	}
 
 	template<class T>
-	inline matrix<T> average(const matrix<T>& mat1, const matrix<T>& mat2) {
+	matrix<T> average(const matrix<T>& mat1, const matrix<T>& mat2) {
 		assert(mat1.get_m() == mat2.get_m() && mat1.get_n() == mat2.get_n());
 
 		const uint_fast8_t m = mat1.get_m();
@@ -266,7 +266,7 @@ namespace _matrix {
 
 	//crossover two matrices swapping rows
 	template<class T>
-	inline std::pair<matrix<T>, matrix<T>> row_crossover(const matrix<T>& mat1, const matrix<T>& mat2) {
+	std::pair<matrix<T>, matrix<T>> row_crossover(const matrix<T>& mat1, const matrix<T>& mat2) {
 		assert(mat1.get_m() == mat2.get_m() && mat1.get_n() == mat2.get_n());
 
 		const uint_fast8_t m = mat1.get_m();
@@ -279,7 +279,7 @@ namespace _matrix {
 	}
 
 	template<class T>
-	inline std::pair<matrix<T>, matrix<T>> x_crossover(const matrix<T>& mat1, const matrix<T>& mat2) {
+	std::pair<matrix<T>, matrix<T>> x_crossover(const matrix<T>& mat1, const matrix<T>& mat2) {
 		assert(mat1.get_m() == mat2.get_m() && mat1.get_n() == mat2.get_n());
 
 		const uint_fast8_t m = mat1.get_m();
@@ -317,7 +317,7 @@ namespace _matrix {
 	}
 
 	template<class T>
-	inline matrix<T> transpose(const matrix<T>& mat) {
+	matrix<T> transpose(const matrix<T>& mat) {
 		const uint_fast8_t _m = mat.get_n(), _n = mat.get_m();
 		std::vector<std::valarray<T>> _data(_m, std::valarray<T>(_n));
 
@@ -331,7 +331,7 @@ namespace _matrix {
 
 	//returns adjunct matrix of mat referred to element ( y , x ) 
 	template<class T>
-	inline matrix<T> adjunct(const matrix<T>& mat, const uint_fast8_t n, const uint_fast8_t y, const uint_fast8_t x) {
+	matrix<T> adjunct(const matrix<T>& mat, const uint_fast8_t n, const uint_fast8_t y, const uint_fast8_t x) {
 		assert(x <= n && y <= n);
 		std::vector<std::valarray<T>> ret_data(n - 1, std::valarray<T>(n - 1));
 		uint_fast8_t _i = 0, _j = 0;
@@ -350,7 +350,7 @@ namespace _matrix {
 
 	//matrix-matrix dot product implementation
 	template<class T>
-	inline matrix<T> big_mat_dot(const matrix<T>& mat1, const matrix<T>& mat2) { //dot product  with transpose for better data locality
+	matrix<T> big_mat_dot(const matrix<T>& mat1, const matrix<T>& mat2) { //dot product  with transpose for better data locality
 		assert(mat1.get_n() == mat2.get_m());
 
 		const auto _m = mat1.get_m(); //return dim m
@@ -368,7 +368,7 @@ namespace _matrix {
 
 	//matrix-matrix dot product implementation
 	template<class T>
-	inline matrix<T> dot(const matrix<T>& mat1, const matrix<T>& mat2) { //smaller matrix dot product implementation
+	matrix<T> dot(const matrix<T>& mat1, const matrix<T>& mat2) { //smaller matrix dot product implementation
 		assert(mat1.get_n() == mat2.get_m());
 
 		const auto _m = mat1.get_m(); //return dim m
@@ -387,7 +387,7 @@ namespace _matrix {
 
 	//to be implemented
 	//template<class T>
-	//inline matrix<T> fast_dot(const matrix<T>& mat1, const matrix<T>& mat2) {
+	//matrix<T> fast_dot(const matrix<T>& mat1, const matrix<T>& mat2) {
 	//	assert(mat1.get_n() == mat2.get_m());
 
 	//	const auto _m = mat1.get_m(); //return dim m
@@ -398,7 +398,7 @@ namespace _matrix {
 
 	//vector-matrix dot product implementation
 	template<class T>
-	inline std::valarray<T> big_mat_dot(const std::valarray<T>& v, const matrix<T>& mat) {//vector-matrix dot product implementation, returns ROW vector as a valarray
+	std::valarray<T> big_mat_dot(const std::valarray<T>& v, const matrix<T>& mat) {//vector-matrix dot product implementation, returns ROW vector as a valarray
 		assert(v.size() == mat.get_m());
 
 		const auto _n = mat.get_n(); //return dim n
@@ -413,7 +413,7 @@ namespace _matrix {
 
 	//vector-matrix dot product implementation
 	template<class T>
-	inline std::valarray<T> dot(const std::valarray<T>& v, const matrix<T>& mat) {//vector-matrix dot product implementation, returns ROW vector as a valarray
+	std::valarray<T> dot(const std::valarray<T>& v, const matrix<T>& mat) {//vector-matrix dot product implementation, returns ROW vector as a valarray
 		assert(v.size() == mat.get_m());
 
 		const auto _n = mat.get_n(); //return dim n
@@ -431,7 +431,7 @@ namespace _matrix {
 
 	//matrix-vector dot product implementation
 	template<class T>
-	inline std::valarray<T> big_mat_dot(const matrix<T>& mat, const std::valarray<T>& v) { 	//matrix-vector dot product implementation, returns COLUMN vector as a valarray
+	std::valarray<T> big_mat_dot(const matrix<T>& mat, const std::valarray<T>& v) { 	//matrix-vector dot product implementation, returns COLUMN vector as a valarray
 
 		assert(v.size() == mat.get_n());
 
@@ -446,7 +446,7 @@ namespace _matrix {
 	}
 
 	template<class T>
-	inline std::valarray<T> dot(const matrix<T>& mat, const std::valarray<T>& v) { 	//matrix-vector dot product implementation, returns COLUMN vector as a valarray
+	std::valarray<T> dot(const matrix<T>& mat, const std::valarray<T>& v) { 	//matrix-vector dot product implementation, returns COLUMN vector as a valarray
 
 		assert(v.size() == mat.get_n());
 
@@ -460,12 +460,12 @@ namespace _matrix {
 	}
 
 	template<class T>
-	inline T determinant(const matrix<T>& mat) {
+	T determinant(const matrix<T>& mat) {
 		return std::get<1>(PII_LUDecomposition(mat));
 	}
 
 	template<class U = double, class T>
-	inline U slow_determinant(const matrix<T>& mat) {
+	U slow_determinant(const matrix<T>& mat) {
 		assert(mat.get_m() == mat.get_n());
 
 		const uint_fast8_t n = mat.get_m();
@@ -497,7 +497,7 @@ namespace _matrix {
 	}
 
 	template<class T>
-	inline std::ostream& operator<<(std::ostream& os, const matrix<T>& mat) {
+	std::ostream& operator<<(std::ostream& os, const matrix<T>& mat) {
 		os << std::fixed;
 		os << std::setprecision(4);
 		for (int i = 0; i < mat.get_m(); ++i) {
@@ -511,7 +511,7 @@ namespace _matrix {
 	}
 
 	template<class T>
-	bool operator==(const matrix<T>& mat1, const matrix<T>& mat2)
+	const bool operator==(const matrix<T>& mat1, const matrix<T>& mat2)
 	{
 		assert(mat1.get_m() == mat2.get_m() && mat1.get_n() == mat2.get_n());
 
@@ -524,7 +524,7 @@ namespace _matrix {
 	}
 
 	template<class T>
-	bool operator!=(const matrix<T>& mat1, const matrix<T>& mat2)
+	const bool operator!=(const matrix<T>& mat1, const matrix<T>& mat2)
 	{
 		return !(mat1 == mat2);
 	}
@@ -533,7 +533,7 @@ namespace _matrix {
 	//http://web.archive.org/web/20150701223512/http://download.intel.com/design/PentiumIII/sml/24504601.pdf
 	//efficient LU decompoition
 	template<class T>
-	inline std::tuple<bool, double, matrix<T>, std::vector<uint_fast8_t>> PII_LUDecomposition(const matrix<T>& source)
+	std::tuple<bool, double, matrix<T>, std::vector<uint_fast8_t>> PII_LUDecomposition(const matrix<T>& source)
 	{
 		// Factors "m" matrix into A=LU where L is lower triangular and U is upper
 		// triangular. The matrix is overwritten by LU with the diagonal elements
@@ -593,7 +593,7 @@ namespace _matrix {
 	}
 
 	template<class T>
-	inline matrix<T> inverse(const matrix<T>& mat) {
+	matrix<T> inverse(const matrix<T>& mat) {
 
 		const uint_fast8_t m = mat.get_m(), n = mat.get_n();
 		assert(m == n);
@@ -649,7 +649,7 @@ namespace _matrix {
 	}
 
 	template<class T>
-	inline std::valarray<T> LU_matrix_vector_solve(const matrix<T>& L, const matrix<T>& U, const std::valarray<T>& d) { // Solves A * y = d   with A = L * U
+	std::valarray<T> LU_matrix_vector_solve(const matrix<T>& L, const matrix<T>& U, const std::valarray<T>& d) { // Solves A * y = d   with A = L * U
 		const uint_fast8_t m = L.get_m(), n = L.get_n();
 		assert(m == n);
 		assert(U.get_m() == m && U.get_n() == n);
