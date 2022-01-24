@@ -485,9 +485,30 @@ int main16() {
 	return EXIT_SUCCESS;
 }
 
+#include "ga_stack_matrix.h"
+int main17() {
+	stopwatch s;
+
+	random::init();
+	stack_matrix<float, 10, 10> sm;
+
+	sm.fill<random::randint>(0 ,10);
+
+	std::cout << sm;
+
+	return EXIT_SUCCESS;
+}
 
 
 int main() {
-	main14();
+	main17();
 	return EXIT_SUCCESS;
 }
+
+template<typename Fn, Fn fn, typename... Args>
+typename std::result_of<Fn(Args...)>::type
+wrapper(Args&&... args) {
+	return fn(std::forward<Args>(args)...);
+}
+#define WRAPPER(FUNC) wrapper<decltype(&FUNC), &FUNC>
+

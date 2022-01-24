@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 /*
 based on:
 	msvc  std::array
@@ -11,7 +12,6 @@ based on:
 //	throw("NRmatrix subscript out of bounds");
 //}
 //#endif
-
 
 template <class _Ty, size_t _Size>
 class matrix_const_iterator {
@@ -35,27 +35,27 @@ public:
 
 	//++iter; retuns by reference mutated original object. Idem for the rest
 	constexpr matrix_const_iterator& operator++() noexcept {
-		++Ptr;
+		++_Ptr;
 		return *this;
 	}
 
 	//iter++; returns by value copy of the original iterator. Idem for the rest
 	constexpr matrix_const_iterator operator++(int) noexcept {
 		matrix_const_iterator _Tmp = *this;
-		++Ptr;
+		++_Ptr;
 		return _Tmp;
 	}
 
 	//--iter;
 	constexpr matrix_const_iterator& operator--() noexcept {
-		--Ptr;
+		--_Ptr;
 		return *this;
 	}
 
 	//iter--;
 	constexpr matrix_const_iterator operator--(int) noexcept {
 		matrix_const_iterator _Tmp = *this;
-		--Ptr;
+		--_Ptr;
 		return _Tmp;
 	}
 
@@ -89,19 +89,19 @@ public:
 		return _Ptr[_Off];
 	}
 
-	[[nodiscard]] constexpr bool operator==(const matrix_const_operator& _Rhs) const noexcept {
+	[[nodiscard]] constexpr bool operator==(const matrix_const_iterator& _Rhs) const noexcept {
 		return _Ptr == _Rhs._Ptr;
 	}
   
 	[[nodiscard]] constexpr bool operator!=(const matrix_const_iterator& _Rhs) const noexcept {
-		return !(*this == _Rhs)
+		return !(*this == _Rhs);
 	}
 
-	[[nodiscard]] constexpr bool operator>(const matrix_const_operator& _Rhs) const noexcept {
+	[[nodiscard]] constexpr bool operator>(const matrix_const_iterator& _Rhs) const noexcept {
 		return _Ptr > _Rhs._Ptr;
 	}
 
-	[[nodiscard]] constexpr bool operator<(const matrix_const_operator& _Rhs) const noexcept {
+	[[nodiscard]] constexpr bool operator<(const matrix_const_iterator& _Rhs) const noexcept {
 		return _Ptr < _Rhs._Ptr;
 	}
 
@@ -120,7 +120,7 @@ private:
 //-------------------------------------------------------------------//
 
 template <class _Ty, size_t _Size>
-class matrix_iterator : public matrix_const_iterator {
+class matrix_iterator : public matrix_const_iterator<_Ty, _Size> {
 public:
 	using _Mybase = matrix_const_iterator<_Ty, _Size>;
 
@@ -138,7 +138,7 @@ public:
 	}
 
 	[[nodiscard]] constexpr pointer operator->() const noexcept {
-		return const_cast<pointer>(_Mybase::operator->())
+		return const_cast<pointer>(_Mybase::operator->());
 	}
 
 	constexpr matrix_iterator& operator++() noexcept {
@@ -206,32 +206,78 @@ public:
 	using const_pointer		= const _Ty*;
 	using reference			= _Ty&;
 	using const_reference	= const _Ty&;
+	using iterator			= matrix_iterator<_Ty, _M * _N>;
+	using const_iterator	= matrix_const_iterator<_Ty, _M * _N>;
 
-	constexpr size_t _Size = _M * _N;
-	_Ty _Elems[_Size];
+	const size_t _Size = _M * _N;
+	_Ty _Elems[_M * _N];
 
 	/*--------------------------------------------*/
 
 	constexpr void fill(const _Ty& _Val) {
-		fill_n(_Elems, _Size, _Val);
+		fill_n(iterator(_Elems), _Size, _Val);
 	}
 
-	constexpr void fill_n(_Ty* const _Dest, const ptrdiff_t _Count, const _Ty _Val) {
+	template<auto fn, typename... Args>
+	constexpr void fill(Args&&... args) {
+		iterator _Curr = iterator(_Elems);
+		for (ptrdiff_t i = 0; i < _Size; ++i, ++_Curr) {
+			*_Curr = fn(std::forward<Args>(args)...);
+		}
+	}
+
+	constexpr void fill_n(const iterator& _Dest, const ptrdiff_t _Count, const _Ty _Val) {
 		#ifdef _CHECKBOUNDS_
-		ptrdiff_t _Diff = _Dest - _Elems;
-		if (_Diff < 0 || _Dest + _Count > _Elems + _Size) {
+		bool a = *_Dest < *_Elems; //Pointer before array
+		bool b = *_Dest + _Count > *_Elems + _Size; //write past array limits
+		if (a || b) {
+			std::cout << "a: " << a<<
+				"b: " << b << std::endl;
 			throw("fill_n subscript out of bounds");
 		}
 		#endif
-		_Ty* _Curr = _Dest;
+		iterator _Curr = _Dest;
 		for (ptrdiff_t i = 0; i < _Count; ++i, ++_Curr) {
 			*_Curr = _Val;
 		}
 	}
 
+	[[nodiscard]] constexpr iterator begin() noexcept {
+		return iterator(_Elems);
+	}
 
+	[[nodiscard]] constexpr const_iterator begin() const noexcept {
+		return const_iterator(_Elems);
+	}
 
+	[[nodiscard]] constexpr iterator end() noexcept {
+		return iterator(_Elems, _Size);
+	}
+
+	[[nodiscard]] constexpr const_iterator end() const noexcept {
+		return const_iterator(_Elems, _Size);
+	}
 };
+
+template<class _Ty, size_t _M, size_t _N>
+constexpr std::ostream& operator<<(std::ostream& os, const stack_matrix<_Ty, _M, _N>& _Mat) {
+	if (!std::is_integral<_Ty>::value) {
+		os << std::fixed;
+		os << std::setprecision(4);
+	}
+	std::cout << "[";
+	for (size_t i = 0; i < _M; ++i) {
+		std::cout << "\n [ ";
+		for (size_t j = 0; j < _N; ++j) {
+			os << _Mat._Elems[i * _M + j] << " ";
+		}
+		os << "]";
+	}
+	std::cout << "\n]\n";
+	os << std::defaultfloat;
+	return os;
+}
+
 
 
 
