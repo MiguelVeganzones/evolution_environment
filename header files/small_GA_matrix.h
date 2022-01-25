@@ -12,7 +12,7 @@
 #include <assert.h>
 
 #ifndef NDEBUG
-#define NDEBUG
+#define NDEBUG 1
 #endif // !NDEBUG
 
 
@@ -136,10 +136,11 @@ namespace _matrix {
 		//--------
 		//utility
 		//--------
+
 		void populate(T(*foo)(), const T scale = 1, const T offset = 0) {
 			for (int i = 0; i < m; ++i)
 				for (int j = 0; j < n; ++j)
-					data[i][j] = foo();
+					data[i][j] = foo() * scale + offset;
 		}
 
 		//mutate the elements of the matrix

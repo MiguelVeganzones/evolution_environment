@@ -490,25 +490,83 @@ int main17() {
 	stopwatch s;
 
 	random::init();
-	stack_matrix<float, 10, 10> sm;
+	ga_sm::stack_matrix<float, 15, 10> sm;
 
 	sm.fill<random::randint>(0 ,10);
 
-	std::cout << sm;
+	auto psm = &sm;
+	{
+		stopwatch s1;
+		auto sm2(sm);
+	}
+
+	std::cout << psm->operator()(0,0);
+	std::cout << (*psm)(0, 0);
+
+	std::cout << sm << std::endl;
+	std::cout << sm[0];
 
 	return EXIT_SUCCESS;
 }
 
+int main18() {
+	using namespace ga_sm;
+
+	random::init();
+
+	stack_matrix<float, 10, 10> sm1;
+	sm1.fill<random::randfloat>();
+
+	stack_matrix<float, 10, 10> sm2;
+	sm2.fill<random::randfloat>();
+
+	std::cout << sm1 << std::endl;
+	std::cout << sm2 << std::endl;
+	std::cout << sm1*sm2 << std::endl;
+
+	sm1.rescale_L_1_1_norm();
+
+	std::cout << sm1 << std::endl;
+
+	
+
+	return EXIT_SUCCESS;
+}
+
+int main19() {
+	using namespace ga_sm;
+	random::init();
+	stack_matrix<float, 24, 25> sm1;
+	stack_matrix<float, 25, 23> sm2;
+	stack_matrix<float, 24, 23> sm3;
+
+	sm1.fill<random::randfloat>();
+	sm2.fill<random::randfloat>();
+
+	{
+		stopwatch s;
+		sm3 = matrix_mul(sm1, sm2);
+	}
+
+	_matrix::matrix<float> m1(random::randfloat, 0, 24, 25);
+	_matrix::matrix<float> m2(random::randfloat, 0, 25, 23);
+	_matrix::matrix<float> m3(24, 23);
+
+	{
+		stopwatch s;
+		m3 = _matrix::dot(m1, m2);
+	}
+
+
+	//std::cout << sm1 << std::endl;
+	//std::cout << sm2 << std::endl;
+	//std::cout << sm3 << std::endl;
+
+	return EXIT_SUCCESS;
+}
 
 int main() {
-	main17();
+	stopwatch s;
+	main19();
 	return EXIT_SUCCESS;
 }
-
-template<typename Fn, Fn fn, typename... Args>
-typename std::result_of<Fn(Args...)>::type
-wrapper(Args&&... args) {
-	return fn(std::forward<Args>(args)...);
-}
-#define WRAPPER(FUNC) wrapper<decltype(&FUNC), &FUNC>
-
