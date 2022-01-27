@@ -218,9 +218,11 @@ namespace ga_sm {
 		using iterator = matrix_iterator<_Ty, _M* _N>;
 		using const_iterator = matrix_const_iterator<_Ty, _M* _N>;
 		using congruent_matrix = stack_matrix<_Ty, _M, _N>;
+		using row_matrix = stack_matrix<_Ty, 1, _N>;
+		using column_matrix = stack_matrix<_Ty, _N, 1>;
 
 		size_t _Size = _M * _N;
-		_Ty _Elems[_M * _N];
+		_Ty _Elems[_M * _N] {};
 
 		/*--------------------------------------------*/
 
@@ -278,7 +280,7 @@ namespace ga_sm {
 			return _Elems[j * _N + i];
 		}
 
-		[[nodiscard]] constexpr stack_matrix<_Ty, 1, _N> operator[](size_t j) const {
+		[[nodiscard]] constexpr row_matrix operator[](size_t j) const {
 			assert(j < _M);
 			stack_matrix<_Ty, 1, _N> _Ret{0};
 			const_iterator _It(_Elems, j * _N);
@@ -405,8 +407,8 @@ namespace ga_sm {
 	}
 
 	template<class _Ty, size_t _M, size_t _K, size_t _N>
-	[[nodiscard]] stack_matrix<_Ty, _M, _N> matrix_mul(
-		const stack_matrix<_Ty, _M, _K>& _Mat1,
+	[[nodiscard]] stack_matrix<_Ty, _M, _N> 
+		matrix_mul(const stack_matrix<_Ty, _M, _K>& _Mat1,
 		const stack_matrix<_Ty, _K, _N>& _Mat2) {
 
 		stack_matrix<_Ty, _M, _N> _Ret{0};
@@ -421,6 +423,151 @@ namespace ga_sm {
 
 		return _Ret;
 	}
+
+	/*
+	efficient LU decompoition of _N by _N matrix M
+	returns: 
+		bool: det(M) != 0
+		double: det(M)
+		congruent_matrix LU: L is lower triangular with unit diagonal (not shown)
+							 U is upped diagonal, including diagonal elements
+		
+	*/
+	template<class _Ty, size_t _N>
+	[[nodiscard]] std::tuple<bool, double, stack_matrix<float, _N, _N>, std::array<size_t, _N>>
+		PII_LUDecomposition(const stack_matrix<_Ty, _N, _N>& _Src)
+	{
+		/*
+		source:
+		http://web.archive.org/web/20150701223512/http://download.intel.com/design/PentiumIII/sml/24504601.pdf
+
+		Factors "_Source" matrix into _Out=LU where L is lower triangular and U is upper
+		triangular. The matrix is overwritten by LU with the diagonal elements
+		of L (which are unity) not stored. This must be a square n x n matrix.
+		*/
+		
+		using float_congruent_matrix = stack_matrix<float, _N, _N>;
+				
+		float_congruent_matrix _Out{};
+		for (size_t j = 0; j < _N; ++j) {
+			for (size_t i = 0; i < _N; ++i) {
+				_Out(j, i) = static_cast<float>(_Src(j, i));
+			}
+		}
+
+		double _Det = 1.0;
+
+		// Initialize the pointer vector.
+		std::array<size_t, _N> _RIdx{}; //row index
+		for (size_t i = 0; i < _N; ++i)
+			_RIdx[i] = i;
+
+		// LU factorization.
+		for (size_t p = 0; p < _N - 1; ++p) {
+			//Find pivot element.
+			for (size_t j = p + 1; j < _N; ++j) {
+				if (abs(_Out(_RIdx[j], p)) > abs(_Out(_RIdx[p], p))) {
+					// Switch the index for the p pivot row if necessary.;
+					std::swap(_RIdx[j], _RIdx[p]);
+					_Det = -_Det;
+					//_RIdx[p] now has the index of the row to consider the pth
+				}
+			}
+			if (_Out(_RIdx[p],p) == 0) {
+				// The matrix is singular. //or not inversible by this methode untill fixed (no permutations)
+				return std::tuple<bool, double, float_congruent_matrix, std::array<size_t, _N>>
+					(false, NAN, _Out, { 0 });
+			}
+			// Multiply the diagonal elements.
+			_Det *= _Out(_RIdx[p], p);
+
+			// Form multiplier.
+			for (size_t j = p + 1; j < _N; ++j) {
+				_Out(_RIdx[j], p) /= _Out(_RIdx[p], p);
+				// Eliminate [p].
+				for (int i = p + 1; i < _N; ++i) {
+					_Out(_RIdx[j], i) -= _Out(_RIdx[j], p) * _Out(_RIdx[p], i);
+				}
+			}
+		}
+
+		_Det *= _Out(_RIdx[_N-1], _N-1); //multiply last diagonal element
+
+		const std::array<size_t, _N> _RI(_RIdx);
+
+		for (size_t j = 0; j < _N; ++j) {
+			if (j != _RIdx[j]) {
+				for (size_t i = 0; i < _N; ++i) {
+					std::swap(_Out(j, i), _Out(_RIdx[j], i));
+				}
+				std::swap(_RIdx[j], _RIdx[std::find(_RIdx.begin(), _RIdx.end(), j) - _RIdx.begin()]);
+			}
+		}
+
+		return std::tuple<bool, double, float_congruent_matrix, std::array<size_t, _N>>
+			(_Det != 0.0, _Det != 0.0 ? _Det : NAN, _Out, _RI);
+	}
+
+	template<class _Ty, size_t _N>
+	[[nodiscard]] double determinant(const stack_matrix<_Ty, _N, _N>& _Src) {
+		return std::get<1>(PII_LUDecomposition(_Src));
+	}
+	
+	/*
+	Reduced row echelon form
+	Uses Gauss-Jordan elimination with partial pivoting	
+	Mutates input
+	*/
+	template<class _Ty, size_t _N>
+	[[nodiscard]] bool RREF(stack_matrix<_Ty, _N, _N + 1>& _Src) {
+		
+		if (std::is_integral<_Ty>::value) {
+			return false;
+		}
+
+		std::array<size_t, _N> _RIdx{};
+		for (size_t i = 0; i < _N; ++i) {
+			_RIdx[i] = i;
+		}
+
+		for (size_t p = 0; p < _N; ++p) {
+			for (size_t j = p + 1; j < _N; ++j) {
+				if (abs(_Src(_RIdx[p], p)) < abs(_Src(_RIdx[j], p))) {
+					std::swap(_RIdx[p], _RIdx[j]);
+				}
+			}
+
+			if (_Src(_RIdx[p], p) == 0) return false; //matrix is singular
+
+			for (size_t i = p + 1; i < _N + 1; ++i) {
+				_Src(_RIdx[p], i) /= _Src(_RIdx[p], p);
+			}
+			_Src(_RIdx[p], p) = 1;
+
+			for (size_t j = 0; j < _N; ++j) {
+				if (j != p) {
+					for (size_t i = p + 1; i < _N + 1; ++i) { //p+1 to avoid removing each rows' scale factor
+						_Src(_RIdx[j], i) -= _Src(_RIdx[p], i) * _Src(_RIdx[j], p);
+					}
+					_Src(_RIdx[j], p) = 0;
+				}
+			}
+		}
+
+		for (size_t j = 0; j < _N; ++j) {
+			if (j != _RIdx[j]) {
+				for (size_t i = 0; i < _N + 1; ++i) {
+					std::swap(_Src(j, i), _Src(_RIdx[j], i));
+				}
+				std::swap(_RIdx[j], _RIdx[std::find(_RIdx.begin(), _RIdx.end(), j) - _RIdx.begin()]);
+			}
+		}
+
+		return true;
+
+	}
+
+
 }
 
 

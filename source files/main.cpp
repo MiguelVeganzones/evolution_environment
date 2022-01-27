@@ -536,26 +536,41 @@ int main18() {
 int main19() {
 	using namespace ga_sm;
 	random::init();
-	stack_matrix<float, 24, 25> sm1;
-	stack_matrix<float, 25, 23> sm2;
-	stack_matrix<float, 24, 23> sm3;
+	const int N = 20;
+	
+	//std::cout << sm1 << std::endl;
 
-	sm1.fill<random::randfloat>();
-	sm2.fill<random::randfloat>();
-
-	{
-		stopwatch s;
-		sm3 = matrix_mul(sm1, sm2);
-	}
-
-	_matrix::matrix<float> m1(random::randfloat, 0, 24, 25);
-	_matrix::matrix<float> m2(random::randfloat, 0, 25, 23);
-	_matrix::matrix<float> m3(24, 23);
+	//sm1.fill<random::randint>(0, 20);
+	//sm2.fill<random::randint>(0, 20);
+	//sm3.fill<random::randint>(0, 20);
 
 	{
+		std::cout << "stack\n";
 		stopwatch s;
-		m3 = _matrix::dot(m1, m2);
+
+		stack_matrix<float, N, N> sm1;
+		stack_matrix<float, N, N> sm2;
+		//sm3;
+
+		sm1.fill<random::randfloat>();
+		sm2.fill<random::randfloat>();
+		stack_matrix<float, N, N> sm3 = matrix_mul(sm1, sm2);
+
+		std::cout << sm3(0, 0) << std::endl;
+		
 	}
+
+	//std::cout << sm1 << "\n" << sm2 << std::endl;
+	//std::cout << sm3 << std::endl;
+
+	//_matrix::matrix<float> m1(random::randfloat, 0, 24, 25);
+	//_matrix::matrix<float> m2(random::randfloat, 0, 25, 23);
+	//_matrix::matrix<float> m3(24, 23);
+
+	//{
+	//	stopwatch s;
+	//	m3 = _matrix::dot(m1, m2);
+	//}
 
 
 	//std::cout << sm1 << std::endl;
@@ -565,8 +580,55 @@ int main19() {
 	return EXIT_SUCCESS;
 }
 
+int main20() {
+	using namespace ga_sm;
+	{
+		std::cout << "randinit\n";
+		stopwatch s;
+		random::init();
+	}
+	const int N = 20;
+
+	{
+		std::cout << "heap\n";
+		stopwatch s;
+		
+		auto sm1 = std::make_unique<stack_matrix<float, N, N>>();
+		auto sm2 = std::make_unique<stack_matrix<float, N, N>>();
+
+		sm1->fill<random::randfloat>();
+		sm2->fill<random::randfloat>();
+		auto sm3 = std::make_unique<stack_matrix<float, N, N>>
+			(matrix_mul(*sm1, *sm2));
+
+		std::cout << (*sm3)(0, 0) << std::endl;
+
+	}
+	//std::cout << sm1 << std::endl;
+	return EXIT_SUCCESS;
+}
+
+int main21() {
+	using namespace ga_sm;
+	//random::init();
+	const int N = 5;
+
+	//std::cout << sm1 << std::endl;
+
+	stack_matrix<float, N, N+1> sm1;
+	
+	sm1.fill<random::randfloat>();
+	std::cout << sm1 << std::endl;
+
+	if (RREF(sm1)) {
+		std::cout << sm1;
+	}
+
+	return EXIT_SUCCESS;
+}
+
+
 int main() {
-	stopwatch s;
-	main19();
+	main21();
 	return EXIT_SUCCESS;
 }
