@@ -646,7 +646,7 @@ namespace _matrix {
 			inv_T_data[i] = LU_matrix_vector_solve(L, U, Pi);
 		}
 
-		return transpose(inv_T_data);
+		return transpose<T>(inv_T_data);
 	}
 
 	template<class T>

@@ -312,14 +312,6 @@ namespace ga_sm {
 			return _Ret;
 		}
 
-		[[nodiscard]] constexpr congruent_matrix operator*(const congruent_matrix& _Other) const {
-			congruent_matrix _Ret(*this);
-			for (size_t i = 0; i < _Size; ++i) {
-				_Ret._Elems[i] *= _Other._Elems[i];
-			}
-			return _Ret;
-		}
-
 		[[nodiscard]] constexpr congruent_matrix operator/(const _Ty p) const {
 			congruent_matrix _Ret(*this);
 			for (auto& e : _Ret) e /= p;
@@ -517,21 +509,24 @@ namespace ga_sm {
 	Reduced row echelon form
 	Uses Gauss-Jordan elimination with partial pivoting	
 	Mutates input
+
+	Can be used to solve systems of linear equations with an aumented matrix
+	or to invert a matrix M :: (M|I) -> (I|M^-1)
 	*/
-	template<class _Ty, size_t _N>
-	[[nodiscard]] bool RREF(stack_matrix<_Ty, _N, _N + 1>& _Src) {
-		
-		if (std::is_integral<_Ty>::value) {
+	template<class _Ty, size_t _M, size_t _N>
+	[[nodiscard]] bool RREF(stack_matrix<_Ty, _M, _N>& _Src) {
+
+		if (std::is_integral<_Ty>::value or (_M > _N)) {
 			return false;
 		}
 
-		std::array<size_t, _N> _RIdx{};
-		for (size_t i = 0; i < _N; ++i) {
+		std::array<size_t, _M> _RIdx{};
+		for (size_t i = 0; i < _M; ++i) {
 			_RIdx[i] = i;
 		}
 
-		for (size_t p = 0; p < _N; ++p) {
-			for (size_t j = p + 1; j < _N; ++j) {
+		for (size_t p = 0; p < _M; ++p) {
+			for (size_t j = p + 1; j < _M; ++j) {
 				if (abs(_Src(_RIdx[p], p)) < abs(_Src(_RIdx[j], p))) {
 					std::swap(_RIdx[p], _RIdx[j]);
 				}
@@ -539,14 +534,14 @@ namespace ga_sm {
 
 			if (_Src(_RIdx[p], p) == 0) return false; //matrix is singular
 
-			for (size_t i = p + 1; i < _N + 1; ++i) {
+			for (size_t i = p + 1; i < _N; ++i) {
 				_Src(_RIdx[p], i) /= _Src(_RIdx[p], p);
 			}
 			_Src(_RIdx[p], p) = 1;
 
-			for (size_t j = 0; j < _N; ++j) {
+			for (size_t j = 0; j < _M; ++j) {
 				if (j != p) {
-					for (size_t i = p + 1; i < _N + 1; ++i) { //p+1 to avoid removing each rows' scale factor
+					for (size_t i = p + 1; i < _N; ++i) { //p+1 to avoid removing each rows' scale factor
 						_Src(_RIdx[j], i) -= _Src(_RIdx[p], i) * _Src(_RIdx[j], p);
 					}
 					_Src(_RIdx[j], p) = 0;
@@ -554,9 +549,9 @@ namespace ga_sm {
 			}
 		}
 
-		for (size_t j = 0; j < _N; ++j) {
+		for (size_t j = 0; j < _M; ++j) {
 			if (j != _RIdx[j]) {
-				for (size_t i = 0; i < _N + 1; ++i) {
+				for (size_t i = 0; i < _N; ++i) {
 					std::swap(_Src(j, i), _Src(_RIdx[j], i));
 				}
 				std::swap(_RIdx[j], _RIdx[std::find(_RIdx.begin(), _RIdx.end(), j) - _RIdx.begin()]);
@@ -567,6 +562,87 @@ namespace ga_sm {
 
 	}
 
+	/*
+	Inverts N*N matrix using gauss-jordan reduction with pivoting
+	*/
+	template<class _Ty, size_t _N>
+	[[nodsicard]] bool  
+		inverse(const stack_matrix<_Ty, _N, _N>& _Src, stack_matrix<float, _N, _N>& _Dest) {
+		
+		stack_matrix<float, _N, _N * 2> _Temp{};
+
+		//M
+		for (size_t j = 0; j < _N; ++j) {
+			for (size_t i = 0; i < _N; ++i) {
+				_Temp(j, i) = static_cast<float>(_Src(j, i));
+			}
+		}
+		//I
+		for (size_t j = 0; j < _N; ++j) {
+			_Temp(j, j + _N) = 1;
+		}
+
+		std::cout << _Temp << "\n";
+
+		if (RREF(_Temp)) {
+			for (size_t j = 0; j < _N; ++j) {
+				for (size_t i = 0; i < _N; ++i) {
+					_Dest(j, i) = _Temp(j, i + _N);
+				}
+			}
+
+			return true;
+		}
+		return false;
+	}
+
+	template<class _Ty, size_t _N>
+	[[nodiscard]] stack_matrix<_Ty, _N, _N> identity(void) {
+		stack_matrix<_Ty, _N, _N> _Ret{};
+		for (size_t i = 0; i < _N; ++i) {
+			_Ret(i, i) = static_cast<_Ty>(1);
+		}
+		return _Ret;
+	}
+
+	template<class _Ty, size_t _N>
+	[[nodiscard]] stack_matrix<_Ty, _N, _N> transpose(const stack_matrix<_Ty, _N, _N>& _Src) {
+		stack_matrix<_Ty, _N, _N> _Ret{ _Src };
+		for (size_t j = 0; j < _N - 1; ++j) {
+			for (size_t i = j + 1; i < _N; ++i) {
+				std::swap(_Ret(j, i), _Ret(i, j));
+			}
+		}
+		return _Ret;
+	}
+
+	template<class _Ty2, class _Ty1, size_t _M, size_t _N>
+	[[nodiscrad]] stack_matrix<_Ty2, _M, _N> 
+		cast_to(const stack_matrix<_Ty1, _M, _N>& _Src) {
+		
+		stack_matrix<_Ty2, _M, _N> _Ret{};
+
+		for (size_t j = 0; j < _M; ++j) {
+			for (size_t i = 0; i < _N; ++i) {
+				_Ret(j, i) = static_cast<_Ty2>(_Src(j, i));
+			}
+		}
+		
+		return _Ret;
+	}
+
+	template<class _Ty, size_t _M, size_t _N>
+	[[nodiscard]] constexpr stack_matrix<_Ty, _M, _N> 
+		element_wise_mul(const stack_matrix<_Ty, _M, _N>& _Mat1, const stack_matrix<_Ty, _M, _N>& _Mat2) {
+
+		stack_matrix<_Ty, _M, _N> _Ret(_Mat1);
+		for (size_t j = 0; j < _M; ++j) {
+			for (size_t i = 0; i < _N; ++i) {
+				_Ret(j, i) *= _Mat2(j, i);
+			}
+		}
+		return _Ret;
+	}
 
 }
 

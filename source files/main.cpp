@@ -522,7 +522,6 @@ int main18() {
 
 	std::cout << sm1 << std::endl;
 	std::cout << sm2 << std::endl;
-	std::cout << sm1*sm2 << std::endl;
 
 	sm1.rescale_L_1_1_norm();
 
@@ -610,7 +609,7 @@ int main20() {
 
 int main21() {
 	using namespace ga_sm;
-	//random::init();
+	random::init();
 	const int N = 5;
 
 	//std::cout << sm1 << std::endl;
@@ -627,8 +626,29 @@ int main21() {
 	return EXIT_SUCCESS;
 }
 
-
 int main() {
-	main21();
+
+	const size_t N = 4;
+	ga_sm::stack_matrix<int, N, N> sm{};
+	ga_sm::stack_matrix<float, N, N> inv{};
+	sm.fill<random::randint>(0, 9);
+	
+	
+
+	//std::cout << sm << std::endl;
+	{
+		stopwatch s_;
+		if (ga_sm::inverse(sm, inv)) {
+			//	std::cout << sm << std::endl;
+		}
+
+		std::cout << sm << std::endl << inv << std::endl;
+
+		auto fsm = ga_sm::cast_to<float>(sm);
+		std::cout << ga_sm::matrix_mul(fsm,inv) << std::endl;
+		std::cout << ga_sm::element_wise_mul(fsm, inv) << std::endl;
+
+	}
+
 	return EXIT_SUCCESS;
 }
