@@ -334,11 +334,23 @@ namespace ga_sm {
 			return _Ret;
 		}
 
+		constexpr congruent_matrix operator*=(const _Ty p) noexcept {
+			for (auto& e : *this) e *= p;
+			return *this;
+		}
+
 		[[nodiscard]] constexpr congruent_matrix operator/(const _Ty p) const {
 			congruent_matrix _Ret(*this);
 			for (auto& e : _Ret) e /= p;
 			return _Ret;
 		}
+
+		constexpr congruent_matrix operator/=(const _Ty p) {
+			assert(!std::is_integral<_Ty>::value);
+			for (auto& e : *this) e /= p;
+			return *this;
+		}
+
 
 		/*-----------------------------------------------------------------
 							###		Utility		###
@@ -361,7 +373,8 @@ namespace ga_sm {
 	};
 
 	template<class _Ty, size_t _M, size_t _N>
-	std::ostream& operator<<(std::ostream& os, const stack_matrix<_Ty, _M, _N>& _Mat) {
+	std::ostream& 
+		operator<<(std::ostream& os, const stack_matrix<_Ty, _M, _N>& _Mat) {
 		if (!std::is_integral<_Ty>::value) {
 			os << std::fixed;
 			os << std::setprecision(4);
@@ -379,9 +392,20 @@ namespace ga_sm {
 		return os;
 	}
 
+	/*
+	Returns exactly equals for integral types and nearly equals if else
+	*/
+	template<class _Ty, size_t _M, size_t _N>
+	[[nodiscard]] constexpr bool 
+		operator==(const stack_matrix<_Ty, _M, _N>& _Mat1, const stack_matrix<_Ty, _M, _N>& _Mat2) {
+		return std::is_integral<_Ty>::value ? exactly_equals(_Mat1, _Mat2) : nearly_equals(_Mat1, _Mat2);
+	}
+
 	template<class _Ty, size_t _M, size_t _N>
 	[[nodiscard]] std::pair<stack_matrix<_Ty, _M, _N>, stack_matrix<_Ty, _M, _N>>
-		x_crossover(const stack_matrix<_Ty, _M, _N>& _Mat1, const stack_matrix<_Ty, _M, _N> _Mat2) {
+		x_crossover(
+			const stack_matrix<_Ty, _M, _N>& _Mat1, 
+			const stack_matrix<_Ty, _M, _N> _Mat2) {
 
 		//indices to slice. a: horizontal, b: vertical
 		size_t a = random::randint(0, _M);
@@ -422,7 +446,9 @@ namespace ga_sm {
 
 	template<class _Ty, size_t _M, size_t _K, size_t _N>
 	[[nodiscard]] constexpr stack_matrix<_Ty, _M, _N>
-		matrix_mul(const stack_matrix<_Ty, _M, _K>& _Mat1, const stack_matrix<_Ty, _K, _N>& _Mat2) {
+		matrix_mul(
+			const stack_matrix<_Ty, _M, _K>& _Mat1, 
+			const stack_matrix<_Ty, _K, _N>& _Mat2) {
 
 		stack_matrix<_Ty, _M, _N> _Ret{0};
 
@@ -442,13 +468,14 @@ namespace ga_sm {
 	returns: 
 		bool: det(M) != 0
 		double: det(M)
-		congruent_matrix LU: L is lower triangular with unit diagonal (not shown)
+		congruent_matrix LU: L is lower triangular with unit diagonal (implicit)
 							 U is upped diagonal, including diagonal elements
 		
 	*/
 	template<class _Ty, size_t _N>
 	[[nodiscard]] std::tuple<bool, double, stack_matrix<float, _N, _N>, std::array<size_t, _N>>
-		PII_LUDecomposition(const stack_matrix<_Ty, _N, _N>& _Src)
+		PII_LUDecomposition(
+			const stack_matrix<_Ty, _N, _N>& _Src)
 	{
 		/*
 		source:
@@ -522,7 +549,9 @@ namespace ga_sm {
 	}
 
 	template<class _Ty, size_t _N>
-	[[nodiscard]] double determinant(const stack_matrix<_Ty, _N, _N>& _Src) { //Not constexpr for calling a non-constexpr function
+	[[nodiscard]] double 
+		determinant(
+			const stack_matrix<_Ty, _N, _N>& _Src) { //Not constexpr for calling a non-constexpr function
 		return std::get<1>(PII_LUDecomposition(_Src));
 	}
 	
@@ -535,7 +564,9 @@ namespace ga_sm {
 	or to invert a matrix M :: (M|I) -> (I|M^-1)
 	*/
 	template<class _Ty, size_t _M, size_t _N>
-	[[nodiscard]] bool RREF(stack_matrix<_Ty, _M, _N>& _Src) {
+	[[nodiscard]] bool 
+		RREF(
+			stack_matrix<_Ty, _M, _N>& _Src) {
 
 		if (std::is_integral<_Ty>::value or (_M > _N)) {
 			return false;
@@ -589,7 +620,9 @@ namespace ga_sm {
 	*/
 	template<class _Ty, size_t _N>
 	[[nodiscard]] bool
-		inverse(const stack_matrix<_Ty, _N, _N>& _Src, stack_matrix<float, _N, _N>& _Dest) {
+		inverse(
+			const stack_matrix<_Ty, _N, _N>& _Src, 
+			stack_matrix<float, _N, _N>& _Dest) {
 		
 		stack_matrix<float, _N, _N * 2> _Temp{};
 
@@ -617,7 +650,8 @@ namespace ga_sm {
 	}
 
 	template<class _Ty, size_t _N>
-	[[nodiscard]] constexpr stack_matrix<_Ty, _N, _N> identity(void) {
+	[[nodiscard]] constexpr stack_matrix<_Ty, _N, _N> 
+		identity(void) {
 		stack_matrix<_Ty, _N, _N> _Ret{};
 		for (size_t i = 0; i < _N; ++i) {
 			_Ret(i, i) = static_cast<_Ty>(1);
@@ -626,7 +660,9 @@ namespace ga_sm {
 	}
 
 	template<class _Ty, size_t _N>
-	[[nodiscard]] constexpr stack_matrix<_Ty, _N, _N> transpose(const stack_matrix<_Ty, _N, _N>& _Src) {
+	[[nodiscard]] constexpr stack_matrix<_Ty, _N, _N> 
+		transpose(
+			const stack_matrix<_Ty, _N, _N>& _Src) {
 		stack_matrix<_Ty, _N, _N> _Ret{ _Src };
 		for (size_t j = 0; j < _N - 1; ++j) {
 			for (size_t i = j + 1; i < _N; ++i) {
@@ -638,7 +674,8 @@ namespace ga_sm {
 
 	template<class _Ty2, class _Ty1, size_t _M, size_t _N>
 	[[nodiscard]] constexpr stack_matrix<_Ty2, _M, _N>
-		cast_to(const stack_matrix<_Ty1, _M, _N>& _Src) {
+		cast_to(
+			const stack_matrix<_Ty1, _M, _N>& _Src) {
 		
 		stack_matrix<_Ty2, _M, _N> _Ret{};
 
@@ -653,7 +690,9 @@ namespace ga_sm {
 
 	template<class _Ty, size_t _M, size_t _N>
 	[[nodiscard]] constexpr stack_matrix<_Ty, _M, _N> 
-		element_wise_mul(const stack_matrix<_Ty, _M, _N>& _Mat1, const stack_matrix<_Ty, _M, _N>& _Mat2) {
+		element_wise_mul(
+			const stack_matrix<_Ty, _M, _N>& _Mat1, 
+			const stack_matrix<_Ty, _M, _N>& _Mat2) {
 
 		stack_matrix<_Ty, _M, _N> _Ret(_Mat1);
 		for (size_t j = 0; j < _M; ++j) {
@@ -680,7 +719,65 @@ namespace ga_sm {
 		}
 		return true;
 	}
-}
+
+	template<class _Ty, size_t _M, size_t _N>
+	[[nodiscard]] constexpr bool
+		exactly_equals(
+			const stack_matrix<_Ty, _M, _N>& _Mat1,
+			const stack_matrix<_Ty, _M, _N>& _Mat2) {
+
+		for (size_t j = 0; j < _M; ++j) {
+			for (size_t i = 0; i < _N; ++i) {
+				if (_Mat1(j, i) != _Mat2(j, i)) return false;
+			}
+		}
+		return true;
+	}
+
+	//returns L1 distance divided by the number of elements
+	template<class _Ty, size_t _M, size_t _N>
+	[[nodiscard]] constexpr float
+		normaliced_L1_distance(
+			const stack_matrix<_Ty, _M, _N>& _Mat1,
+			const stack_matrix<_Ty, _M, _N>& _Mat2) {
+		
+		_Ty _L1{};
+
+		for (size_t j = 0; j < _M; ++j) {
+			for (size_t i = 0; i < _N; ++i) {
+				_L1 += abs(_Mat1 - _Mat2);
+			}
+		}
+		return static_cast<float>(_L1) / static_cast<float>(_M + _N);
+	}
+
+	//returns the element-wise average of two matrices
+	template<class _Ty, size_t _M, size_t _N>
+	[[nodiscard]] constexpr stack_matrix<_Ty, _M, _N>
+		normaliced_L1_distance(
+			const stack_matrix<_Ty, _M, _N>& _Mat1,
+			const stack_matrix<_Ty, _M, _N>& _Mat2) {
+
+		stack_matrix<_Ty, _M, _N> _Ret{};
+
+		for (size_t j = 0; j < _M; ++j) {
+			for (size_t i = 0; i < _N; ++i) {
+				_Ret(j, i) = static_cast<_Ty>( 
+					(_Mat1(j, i) + _Mat2(j, i)) / static_cast<_Ty>(2) );
+			}
+		}
+		return _Ret;
+	}
+ 
+
+} /* namespace ga_sm */
+
+
+
+
+
+
+
 
 
 

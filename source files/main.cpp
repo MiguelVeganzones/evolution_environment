@@ -633,26 +633,31 @@ constexpr bool main22() {
 	constexpr size_t N = 4;
 
 	
-	stack_matrix<int, N, N> sm1{};
+	stack_matrix<int, N, N> sm1{}, sm11{};
 	stack_matrix<float, N, N> sm2{}, sm4{}, sm5{};
 
 	sm1 = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 };
 	sm2 = cast_to<float>(sm1);
-	bool b{1};
+
+	sm5 = sm4;
+	bool b = sm4 == (sm5*=-1);
 	sm4.fill(10);
 	auto sm3 = element_wise_mul(sm2, sm2);
 	sm4 = identity<float, N>();
-
-	b = nearly_equals(sm2, sm2);
 
 	return b;
 }
 
 int main() {
 	
-	stopwatch s;
+	{
+		stopwatch s;
+		static_assert(main22());
+	}
 
-	static_assert(main22());
-
+	{
+		stopwatch s;
+		std::cout<<main22();
+	}
 	return EXIT_SUCCESS;
 }
