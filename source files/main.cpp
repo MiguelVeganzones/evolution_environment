@@ -490,7 +490,7 @@ int main17() {
 	stopwatch s;
 
 	random::init();
-	ga_sm::stack_matrix<float, 15, 10> sm;
+	ga_sm::stack_matrix<int, 15, 10> sm;
 
 	sm.fill<random::randint>(0 ,10);
 
@@ -626,29 +626,33 @@ int main21() {
 	return EXIT_SUCCESS;
 }
 
+constexpr bool main22() {
+
+	using namespace ga_sm;
+	
+	constexpr size_t N = 4;
+
+	
+	stack_matrix<int, N, N> sm1{};
+	stack_matrix<float, N, N> sm2{}, sm4{}, sm5{};
+
+	sm1 = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 };
+	sm2 = cast_to<float>(sm1);
+	bool b{1};
+	sm4.fill(10);
+	auto sm3 = element_wise_mul(sm2, sm2);
+	sm4 = identity<float, N>();
+
+	b = nearly_equals(sm2, sm2);
+
+	return b;
+}
+
 int main() {
-
-	const size_t N = 4;
-	ga_sm::stack_matrix<int, N, N> sm{};
-	ga_sm::stack_matrix<float, N, N> inv{};
-	sm.fill<random::randint>(0, 9);
 	
-	
+	stopwatch s;
 
-	//std::cout << sm << std::endl;
-	{
-		stopwatch s_;
-		if (ga_sm::inverse(sm, inv)) {
-			//	std::cout << sm << std::endl;
-		}
-
-		std::cout << sm << std::endl << inv << std::endl;
-
-		auto fsm = ga_sm::cast_to<float>(sm);
-		std::cout << ga_sm::matrix_mul(fsm,inv) << std::endl;
-		std::cout << ga_sm::element_wise_mul(fsm, inv) << std::endl;
-
-	}
+	static_assert(main22());
 
 	return EXIT_SUCCESS;
 }

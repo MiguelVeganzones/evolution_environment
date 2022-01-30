@@ -221,27 +221,49 @@ namespace ga_sm {
 		using row_matrix = stack_matrix<_Ty, 1, _N>;
 		using column_matrix = stack_matrix<_Ty, _N, 1>;
 
-		size_t _Size = _M * _N;
 		_Ty _Elems[_M * _N] {};
 
 		/*--------------------------------------------*/
 
 		constexpr void fill(const _Ty& _Val) {
-			fill_n(iterator(_Elems), _Size, _Val);
+			fill_n(iterator(_Elems), _M * _N, _Val);
 		}
 
 		template<auto fn, typename... Args>
-		constexpr void fill(Args&&... args) {
+		constexpr void fill(Args&&... _Args) {
 			iterator _Curr = iterator(_Elems);
-			for (ptrdiff_t i = 0; i < _Size; ++i, ++_Curr) {
-				*_Curr = fn(std::forward<Args>(args)...);
+			for (ptrdiff_t i = 0; i < _M * _N; ++i, ++_Curr) {
+				*_Curr = static_cast<_Ty>(fn(std::forward<Args>(_Args)...));
+			}
+		}
+
+		/*
+		Each element of the matrix might be: 
+			Modifies by a normal distribution given by [_Avg, _Stddev] with a probability of p1: // e += randnoral(avg, stddev)
+			Replaced by a value given by fn scaled by _Ampl2 with a probability of p2-p1: // e = (fn(args...) + offset) * ampl
+		*/
+		template<auto fn, auto... _Args>
+		void mutate(float _Avg, float _Stddev, float p1, float p2, float _Ampl = 1, float _Offset = -0.5) {
+			assert(!std::is_integral<_Ty>::value);
+			assert(p2 >= p1);
+
+			iterator _Curr = iterator(_Elems);
+			float _Rand;
+			for (ptrdiff_t i = 0; i < _M * _N; ++i, ++_Curr) {
+				_Rand = random::randfloat();
+				if (_Rand < p1) {
+					*_Curr += static_cast<_Ty>(random::randnormal(_Avg, _Stddev));
+				}
+				else if (_Rand < p2) {
+					*_Curr = static_cast<_Ty>( (static_cast<float>(fn(_Args...)) + _Offset) * _Ampl );
+				}
 			}
 		}
 
 		constexpr void fill_n(const iterator& _Dest, const ptrdiff_t _Count, const _Ty _Val) {
 			#ifdef _CHECKBOUNDS_
 			bool a = *_Dest < *_Elems; //Pointer before array
-			bool b = *_Dest + _Count > *_Elems + _Size; //write past array limits
+			bool b = *_Dest + _Count > *_Elems + _M * _N; //write past array limits
 			if (a || b) {
 				std::cout << "a: " << a <<
 					"b: " << b << std::endl;
@@ -263,11 +285,11 @@ namespace ga_sm {
 		}
 
 		[[nodiscard]] constexpr iterator end() noexcept {
-			return iterator(_Elems, _Size);
+			return iterator(_Elems, _M * _N);
 		}
 
 		[[nodiscard]] constexpr const_iterator end() const noexcept {
-			return const_iterator(_Elems, _Size);
+			return const_iterator(_Elems, _M * _N);
 		}
 
 		[[nodiscard]] constexpr reference operator()(const size_t j, const size_t i) noexcept {
@@ -282,7 +304,7 @@ namespace ga_sm {
 
 		[[nodiscard]] constexpr row_matrix operator[](size_t j) const {
 			assert(j < _M);
-			stack_matrix<_Ty, 1, _N> _Ret{0};
+			stack_matrix<_Ty, 1, _N> _Ret{};
 			const_iterator _It(_Elems, j * _N);
 			for (size_t i = 0; i < _N; ++i, ++_It) {
 				_Ret(0, i) = *_It;
@@ -292,7 +314,7 @@ namespace ga_sm {
 
 		[[nodiscard]] constexpr congruent_matrix operator+(const congruent_matrix& _Other) const {
 			congruent_matrix _Ret(*this);
-			for (size_t i = 0; i < _Size; ++i) {
+			for (size_t i = 0; i < _M * _N; ++i) {
 				_Ret._Elems[i] += _Other._Elems[i];
 			}
 			return _Ret;
@@ -300,7 +322,7 @@ namespace ga_sm {
 
 		[[nodiscard]] constexpr congruent_matrix operator-(const congruent_matrix& _Other) const {
 			congruent_matrix _Ret(*this);
-			for (size_t i = 0; i < _Size; ++i) {
+			for (size_t i = 0; i < _M * _N; ++i) {
 				_Ret._Elems[i] -= _Other._Elems[i];
 			}
 			return _Ret;
@@ -339,7 +361,7 @@ namespace ga_sm {
 	};
 
 	template<class _Ty, size_t _M, size_t _N>
-	constexpr std::ostream& operator<<(std::ostream& os, const stack_matrix<_Ty, _M, _N>& _Mat) {
+	std::ostream& operator<<(std::ostream& os, const stack_matrix<_Ty, _M, _N>& _Mat) {
 		if (!std::is_integral<_Ty>::value) {
 			os << std::fixed;
 			os << std::setprecision(4);
@@ -348,7 +370,7 @@ namespace ga_sm {
 		for (size_t j = 0; j < _M; ++j) {
 			std::cout << "\n [ ";
 			for (size_t i = 0; i < _N; ++i) {
-				os << _Mat._Elems[j * _N + i] << " ";
+				os << _Mat(j, i) << " ";
 			}
 			os << "]";
 		}
@@ -358,7 +380,7 @@ namespace ga_sm {
 	}
 
 	template<class _Ty, size_t _M, size_t _N>
-	[[nodiscard]] constexpr std::pair<stack_matrix<_Ty, _M, _N>, stack_matrix<_Ty, _M, _N>>
+	[[nodiscard]] std::pair<stack_matrix<_Ty, _M, _N>, stack_matrix<_Ty, _M, _N>>
 		x_crossover(const stack_matrix<_Ty, _M, _N>& _Mat1, const stack_matrix<_Ty, _M, _N> _Mat2) {
 
 		//indices to slice. a: horizontal, b: vertical
@@ -399,9 +421,8 @@ namespace ga_sm {
 	}
 
 	template<class _Ty, size_t _M, size_t _K, size_t _N>
-	[[nodiscard]] stack_matrix<_Ty, _M, _N> 
-		matrix_mul(const stack_matrix<_Ty, _M, _K>& _Mat1,
-		const stack_matrix<_Ty, _K, _N>& _Mat2) {
+	[[nodiscard]] constexpr stack_matrix<_Ty, _M, _N>
+		matrix_mul(const stack_matrix<_Ty, _M, _K>& _Mat1, const stack_matrix<_Ty, _K, _N>& _Mat2) {
 
 		stack_matrix<_Ty, _M, _N> _Ret{0};
 
@@ -501,7 +522,7 @@ namespace ga_sm {
 	}
 
 	template<class _Ty, size_t _N>
-	[[nodiscard]] double determinant(const stack_matrix<_Ty, _N, _N>& _Src) {
+	[[nodiscard]] double determinant(const stack_matrix<_Ty, _N, _N>& _Src) { //Not constexpr for calling a non-constexpr function
 		return std::get<1>(PII_LUDecomposition(_Src));
 	}
 	
@@ -564,9 +585,10 @@ namespace ga_sm {
 
 	/*
 	Inverts N*N matrix using gauss-jordan reduction with pivoting
+	Not the most efficient algorithm
 	*/
 	template<class _Ty, size_t _N>
-	[[nodsicard]] bool  
+	[[nodiscard]] bool
 		inverse(const stack_matrix<_Ty, _N, _N>& _Src, stack_matrix<float, _N, _N>& _Dest) {
 		
 		stack_matrix<float, _N, _N * 2> _Temp{};
@@ -582,22 +604,20 @@ namespace ga_sm {
 			_Temp(j, j + _N) = 1;
 		}
 
-		std::cout << _Temp << "\n";
+		bool inv_{};
 
-		if (RREF(_Temp)) {
+		if (inv_ = RREF(_Temp)) {
 			for (size_t j = 0; j < _N; ++j) {
 				for (size_t i = 0; i < _N; ++i) {
 					_Dest(j, i) = _Temp(j, i + _N);
 				}
 			}
-
-			return true;
 		}
-		return false;
+		return inv_;
 	}
 
 	template<class _Ty, size_t _N>
-	[[nodiscard]] stack_matrix<_Ty, _N, _N> identity(void) {
+	[[nodiscard]] constexpr stack_matrix<_Ty, _N, _N> identity(void) {
 		stack_matrix<_Ty, _N, _N> _Ret{};
 		for (size_t i = 0; i < _N; ++i) {
 			_Ret(i, i) = static_cast<_Ty>(1);
@@ -606,7 +626,7 @@ namespace ga_sm {
 	}
 
 	template<class _Ty, size_t _N>
-	[[nodiscard]] stack_matrix<_Ty, _N, _N> transpose(const stack_matrix<_Ty, _N, _N>& _Src) {
+	[[nodiscard]] constexpr stack_matrix<_Ty, _N, _N> transpose(const stack_matrix<_Ty, _N, _N>& _Src) {
 		stack_matrix<_Ty, _N, _N> _Ret{ _Src };
 		for (size_t j = 0; j < _N - 1; ++j) {
 			for (size_t i = j + 1; i < _N; ++i) {
@@ -617,7 +637,7 @@ namespace ga_sm {
 	}
 
 	template<class _Ty2, class _Ty1, size_t _M, size_t _N>
-	[[nodiscrad]] stack_matrix<_Ty2, _M, _N> 
+	[[nodiscard]] constexpr stack_matrix<_Ty2, _M, _N>
 		cast_to(const stack_matrix<_Ty1, _M, _N>& _Src) {
 		
 		stack_matrix<_Ty2, _M, _N> _Ret{};
@@ -644,6 +664,22 @@ namespace ga_sm {
 		return _Ret;
 	}
 
+	template<class _Ty, size_t _M, size_t _N>
+	[[nodiscard]] constexpr bool
+		nearly_equals(
+			const stack_matrix<_Ty, _M, _N>& _Mat1,
+			const stack_matrix<_Ty, _M, _N>& _Mat2, 
+			const _Ty epsilon = std::numeric_limits<_Ty>::epsilon()) {
+
+		_Ty d{};
+		for (size_t j = 0; j < _M; ++j) {
+			for (size_t i = 0; i < _N; ++i) {
+				d = _Mat1(j, i) - _Mat2(j, i);
+				if (d * (d < 0 ? -1 : 1) > epsilon) return false;
+			}
+		}
+		return true;
+	}
 }
 
 
