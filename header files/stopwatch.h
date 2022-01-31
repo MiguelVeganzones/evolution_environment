@@ -17,8 +17,9 @@ public:
         end = std::chrono::steady_clock::now();
         std::chrono::duration<double, std::micro> duration = end - start;
         std::cout << std::fixed << std::setprecision(4);
-        std::cout << "Process took " << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() <<
-            "ms\t (" << duration.count() << "us)\t (" <<
+        std::cout << "Process took " << 
+            std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() << "ms\t (" << 
+            duration.count() << "us)\t (" <<
             std::chrono::duration_cast<std::chrono::seconds>(duration).count() << " s)\t (" <<
             std::chrono::duration_cast<std::chrono::minutes>(duration).count() << " mins)\n" << std::defaultfloat;
     }

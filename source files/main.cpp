@@ -626,7 +626,7 @@ int main21() {
 	return EXIT_SUCCESS;
 }
 
-constexpr bool main22() {
+bool main22() {
 
 	using namespace ga_sm;
 	
@@ -637,22 +637,28 @@ constexpr bool main22() {
 	stack_matrix<float, N, N> sm2{}, sm4{}, sm5{};
 
 	sm1 = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 };
-	sm2 = cast_to<float>(sm1);
-
+	//sm2 = cast_to<float>(sm1);
+	sm2.fill<random::randfloat>();
 	sm5 = sm4;
 	bool b = sm4 == (sm5*=-1);
+
+	b = sm4 != sm2;
 	sm4.fill(10);
 	auto sm3 = element_wise_mul(sm2, sm2);
 	sm4 = identity<float, N>();
+
+	std::cout << sm2 << "\n" << sm3;
+	std::cout << matrix_average(sm2, sm3);
 
 	return b;
 }
 
 int main() {
 	
+	stopwatch s0;
 	{
 		stopwatch s;
-		static_assert(main22());
+		//static_assert(main22());
 	}
 
 	{
