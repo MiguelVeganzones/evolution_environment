@@ -626,29 +626,27 @@ int main21() {
 	return EXIT_SUCCESS;
 }
 
-bool main22() {
+constexpr bool main22() {
 
 	using namespace ga_sm;
 	
 	constexpr size_t N = 4;
 
 	
-	stack_matrix<int, N, N> sm1{}, sm11{};
-	stack_matrix<float, N, N> sm2{}, sm4{}, sm5{};
+	stack_matrix<int, N, N> sm1{};
+	stack_matrix<float, N, N> sm2{};
 
-	sm1 = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 };
-	//sm2 = cast_to<float>(sm1);
-	sm2.fill<random::randfloat>();
-	sm5 = sm4;
-	bool b = sm4 == (sm5*=-1);
+	sm1 = { 1,2,3,4,5,6,7,1,9,10,11,1,13,14,5,6 };
+	sm2 = cast_to<float>(sm1);
+	
+	
+	stack_matrix<float, N, N> sm3{};
+	bool b{1};
 
-	b = sm4 != sm2;
-	sm4.fill(10);
-	auto sm3 = element_wise_mul(sm2, sm2);
-	sm4 = identity<float, N>();
-
-	std::cout << sm2 << "\n" << sm3;
-	std::cout << matrix_average(sm2, sm3);
+	if (inverse(sm2, sm3)) {
+		auto a = PII_LUDecomposition(sm2);
+		b = (matrix_mul(sm2, sm3) == identity_matrix<float, N>());
+	}
 
 	return b;
 }
@@ -656,14 +654,17 @@ bool main22() {
 int main() {
 	
 	stopwatch s0;
+
 	{
 		stopwatch s;
-		//static_assert(main22());
+		static_assert(main22());
 	}
 
 	{
 		stopwatch s;
-		std::cout<<main22();
+		std::cout << main22();
 	}
+
+
 	return EXIT_SUCCESS;
 }

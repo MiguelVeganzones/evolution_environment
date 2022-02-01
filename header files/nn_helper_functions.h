@@ -20,3 +20,11 @@ namespace _nn_func {
 		return v;
 	}
 }
+
+namespace cx_helper_func{
+	template<class _Ty, std::enable_if_t<std::is_arithmetic_v<_Ty>>...>
+		[[nodiscard]] constexpr _Ty cx_abs(const _Ty& x) noexcept
+	{
+		return x < 0 ? -x : x;
+	}
+}

@@ -11,11 +11,11 @@ public:
 
 	static int randint(int Min, int Max);
 
+	static float randnormal(const float avg = 0.f, const float stddev = 1.f);
+
 	static int mt_randint(int Min, int Max);
 
 	static float mt_randfloat();
-
-	static float randnormal(const float avg = 0.f, const float stddev = 1.f);
 
 	static float mt_randnormal(const float avg = 0.f, const float stddev = 1.f);
 

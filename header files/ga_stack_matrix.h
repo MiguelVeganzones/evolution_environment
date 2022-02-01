@@ -2,6 +2,7 @@
 #include <iostream>
 #include <array>
 #include "Random.h"
+#include "nn_helper_functions.h"
 /*
 based on:
 	msvc  std::array
@@ -482,7 +483,7 @@ namespace ga_sm {
 		
 	*/
 	template<class _Ty, size_t _N>
-	[[nodiscard]] std::tuple<bool, double, stack_matrix<float, _N, _N>, std::array<size_t, _N>>
+	[[nodiscard]] constexpr std::tuple<bool, double, stack_matrix<float, _N, _N>, std::array<size_t, _N>>
 		PII_LUDecomposition(
 			const stack_matrix<_Ty, _N, _N>& _Src)
 	{
@@ -495,6 +496,7 @@ namespace ga_sm {
 		of L (which are unity) not stored. This must be a square n x n matrix.
 		*/
 		
+		using namespace cx_helper_func;//constexpr abs
 		using float_congruent_matrix = stack_matrix<float, _N, _N>;
 				
 		float_congruent_matrix _Out{};
@@ -515,7 +517,7 @@ namespace ga_sm {
 		for (size_t p = 0; p < _N - 1; ++p) {
 			//Find pivot element.
 			for (size_t j = p + 1; j < _N; ++j) {
-				if (abs(_Out(_RIdx[j], p)) > abs(_Out(_RIdx[p], p))) {
+				if (cx_abs(_Out(_RIdx[j], p)) > cx_abs(_Out(_RIdx[p], p))) {
 					// Switch the index for the p pivot row if necessary.;
 					std::swap(_RIdx[j], _RIdx[p]);
 					_Det = -_Det;
@@ -558,7 +560,7 @@ namespace ga_sm {
 	}
 
 	template<class _Ty, size_t _N>
-	[[nodiscard]] double 
+	[[nodiscard]] constexpr double 
 		determinant(
 			const stack_matrix<_Ty, _N, _N>& _Src) { //Not constexpr for calling a non-constexpr function
 		return std::get<1>(PII_LUDecomposition(_Src));
@@ -570,12 +572,14 @@ namespace ga_sm {
 	Mutates input
 
 	Can be used to solve systems of linear equations with an aumented matrix
-	or to invert a matrix M :: (M|I) -> (I|M^-1)
+	or to invert a matrix M :: ( M | I ) -> ( I | M^-1 )
 	*/
 	template<class _Ty, size_t _M, size_t _N>
-	[[nodiscard]] bool 
+	[[nodiscard]] constexpr bool 
 		RREF(
 			stack_matrix<_Ty, _M, _N>& _Src) {
+
+		using namespace cx_helper_func; //constexpr abs
 
 		if (std::is_integral<_Ty>::value or (_M > _N)) {
 			return false;
@@ -588,7 +592,7 @@ namespace ga_sm {
 
 		for (size_t p = 0; p < _M; ++p) {
 			for (size_t j = p + 1; j < _M; ++j) {
-				if (abs(_Src(_RIdx[p], p)) < abs(_Src(_RIdx[j], p))) {
+				if (cx_abs(_Src(_RIdx[p], p)) < cx_abs(_Src(_RIdx[j], p))) {
 					std::swap(_RIdx[p], _RIdx[j]);
 				}
 			}
@@ -627,12 +631,13 @@ namespace ga_sm {
 	Inverts N*N matrix using gauss-jordan reduction with pivoting
 	Not the most efficient algorithm
 	*/
-	template<class _Ty, size_t _N>
-	[[nodiscard]] bool
+	template<class _Ty1, class _Ty2, size_t _N, 
+		std::enable_if_t<!std::is_integral<_Ty2>::value>...>
+	[[nodiscard]] constexpr bool
 		inverse(
-			const stack_matrix<_Ty, _N, _N>& _Src, 
-			stack_matrix<float, _N, _N>& _Dest) {
-		
+			const stack_matrix<_Ty1, _N, _N>& _Src, 
+			stack_matrix<_Ty2, _N, _N>& _Dest) {
+
 		stack_matrix<float, _N, _N * 2> _Temp{};
 
 		//M
@@ -660,7 +665,8 @@ namespace ga_sm {
 
 	template<class _Ty, size_t _N>
 	[[nodiscard]] constexpr stack_matrix<_Ty, _N, _N> 
-		identity(void) {
+		identity_matrix(void) {
+
 		stack_matrix<_Ty, _N, _N> _Ret{};
 		for (size_t i = 0; i < _N; ++i) {
 			_Ret(i, i) = static_cast<_Ty>(1);
@@ -718,13 +724,13 @@ namespace ga_sm {
 		nearly_equals(
 			const stack_matrix<_Ty, _M, _N>& _Mat1,
 			const stack_matrix<_Ty, _M, _N>& _Mat2, 
-			const _Ty epsilon = std::numeric_limits<_Ty>::epsilon()) {
+			const _Ty epsilon = 1e3 * std::numeric_limits<_Ty>::epsilon()) {
 
 		_Ty d{};
 		for (size_t j = 0; j < _M; ++j) {
 			for (size_t i = 0; i < _N; ++i) {
 				d = _Mat1(j, i) - _Mat2(j, i);
-				if (d * (d < 0 ? -1 : 1) > epsilon) return false;
+				if (cx_helper_func::cx_abs(d) > epsilon) return false;
 			}
 		}
 		return true;
@@ -781,11 +787,6 @@ namespace ga_sm {
  
 
 } /* namespace ga_sm */
-
-
-
-
-
 
 
 
