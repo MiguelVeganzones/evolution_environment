@@ -5,6 +5,7 @@
 #include "stopwatch.h"
 #include "c4_brain.h"
 #include "Random.h"
+#include "ga_stack_nn.h"
 
 int main0() {
 	//probar operator() board
@@ -634,36 +635,101 @@ constexpr bool main22() {
 
 	
 	stack_matrix<int, N, N> sm1{};
-	stack_matrix<float, N, N> sm2{};
+	stack_matrix<double, N, N> sm2{}, sm3{};
 
-	sm1 = { 1,2,3,4,5,6,7,1,9,10,11,1,13,14,5,6 };
-	sm2 = cast_to<float>(sm1);
-	
-	
-	stack_matrix<float, N, N> sm3{};
-	bool b{1};
+	sm1 = { 1,2,3,4,5,6,7,8,9,10,11,1,13,4,5,6 };
+	sm2 = cast_to<double>(sm1);
+
+	bool b{0};
 
 	if (inverse(sm2, sm3)) {
-		auto a = PII_LUDecomposition(sm2);
-		b = (matrix_mul(sm2, sm3) == identity_matrix<float, N>());
+		//auto a = PII_LUDecomposition(sm2);
+		//std::cout << matrix_mul(sm2, sm3) << std::endl;
+		b = (matrix_mul(sm2, sm3) == identity_matrix<double, N>());
 	}
 
 	return b;
 }
 
+
+#include <type_traits>
+bool main23() {
+	using namespace ga_sm;
+
+	using T = stack_matrix<float, 5, 5>;
+
+	std::cout << std::is_trivial<T>::value;
+	std::cout << std::is_trivially_copyable<T>::value;
+	std::cout << std::is_standard_layout<T>::value;
+
+	using A = stack_matrix<int, 5, 5>;
+
+	std::cout << std::is_trivial<A>::value;
+	std::cout << std::is_trivially_copyable<A>::value;
+	std::cout << std::is_standard_layout<A>::value;
+
+
+	return 0;
+}
+
+bool main24() {
+
+	using namespace ga_sm;
+
+	constexpr size_t N = 4;
+
+
+  stack_matrix<int, N, N> sm1;
+	stack_matrix<double, N, N> sm2{}, sm3{}, sm11{}, sm12{};
+
+	sm1 = { 1,2,3,4,5,6,7,8,9,10,11,1,13,4,5,6 };
+  sm12 = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 };
+
+  std::cout << matrix_average<double, N, N>(sm12, sm12, sm11) << std::endl;
+	sm2 = cast_to<double>(sm1);
+
+	bool b{ 0 };
+  std::cout << sm2 << std::endl;
+  sm2.T();
+  std::cout << sm2 << std::endl;
+
+	if (inverse(sm2, sm3)) {
+		std::cout << sm3 << std::endl;
+		std::cout << determinant(sm1) << "\n";
+		std::cout << matrix_mul(sm2, sm3) << std::endl;
+		b = (matrix_mul(sm2, sm3) == identity_matrix<double, N>());
+	}
+
+	return b;
+}
+
+int matrix_mul_bench() {
+  using namespace ga_sm;
+  constexpr size_t N = 30;
+  stack_matrix<float, N, N> sm1{}, sm2{}, sm3{}, sm4{};
+
+  {
+    stopwatch s;
+    sm1.fill<random::randfloat>();
+    sm2.fill<random::randfloat>();
+  }
+  {
+    stopwatch s;
+    sm3 = matrix_mul(sm1, sm2);
+  }
+
+  std::cout << (sm3 == sm4) << "\n";
+
+  return 0;
+}
+
+
+
 int main() {
 	
 	stopwatch s0;
 
-	{
-		stopwatch s;
-		static_assert(main22());
-	}
 
-	{
-		stopwatch s;
-		std::cout << main22();
-	}
 
 
 	return EXIT_SUCCESS;
