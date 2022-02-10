@@ -729,8 +729,8 @@ int main() {
 	
 	stopwatch s0;
 
-
-
-
+  ga_sm_nn::stack_neural_net<float, 2, 2, 4, 4, 6, 6> nn;
+  for (auto& e : nn.s_Size)std::cout << e << " ";
+  std::cout << nn.sm1 << nn.sm2 << nn.sm3;
 	return EXIT_SUCCESS;
 }
