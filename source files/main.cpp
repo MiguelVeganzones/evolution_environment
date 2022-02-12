@@ -690,7 +690,7 @@ bool main24() {
 
 	bool b{ 0 };
   std::cout << sm2 << std::endl;
-  sm2.T();
+  sm2.transposed();
   std::cout << sm2 << std::endl;
 
 	if (inverse(sm2, sm3)) {
@@ -726,11 +726,45 @@ int matrix_mul_bench() {
 
 
 int main() {
-	
-	stopwatch s0;
 
-  ga_sm_nn::stack_neural_net<float, 2, 2, 4, 4, 6, 6> nn;
-  for (auto& e : nn.s_Size)std::cout << e << " ";
-  std::cout << nn.sm1 << nn.sm2 << nn.sm3;
+  stopwatch s0;
+  using namespace ga_sm_nn;
+  //constexpr ga_sm_nn::Matrix_Size a1{ 2,2 };
+  //constexpr ga_sm_nn::Matrix_Size a2{ 4,4 };
+
+  //ga_sm_nn::stack_neural_net<float, a1, a2 , a2> nn{};
+
+  ga_sm::stack_matrix<float, 3, 6> in{};
+  in.fill<random::randfloat>();
+
+  //ga_sm_nn::layer<float, ga_sm_nn::Layer_Shape{ 3,1 }, 6, 4> l1{};
+
+  //l1.initialize<random::randnormal, 0, 1>();
+
+  //std::cout << in << std::endl;
+  //std::cout << l1;
+
+  constexpr Layer_Shape a1{ 1,1 };
+  constexpr Layer_Shape a2{ 2,2 };
+  constexpr Layer_Shape a3{ 3,3 };
+  constexpr Layer_Shape a4{ 4,4 };
+
+
+  stack_neural_net<float, a3, a4, a2, a1> nn{};
+  //
+  //
+  std::cout << nn.layer<0>() << "\n";
+  std::cout << nn.layer<1>() << "\n";
+  std::cout << nn.layer<2>() << "\n";
+  std::cout << nn.layer<3>() << "\n";
+
+  nn.init<random::randnormal, 0, 1>();
+
+  std::cout << nn.layer<0>() << "\n";
+  std::cout << nn.layer<1>() << "\n";
+  std::cout << nn.layer<2>() << "\n";
+  std::cout << nn.layer<3>() << "\n";
+
+  //std::cout << l1.forward_pass(in);
 	return EXIT_SUCCESS;
 }
