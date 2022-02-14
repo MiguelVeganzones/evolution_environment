@@ -746,24 +746,30 @@ int main() {
 
   constexpr Layer_Shape a1{ 1,1 };
   constexpr Layer_Shape a2{ 2,2 };
+  constexpr Layer_Shape a21{ 2,1 };
   constexpr Layer_Shape a3{ 3,3 };
   constexpr Layer_Shape a4{ 4,4 };
+  constexpr Layer_Shape a6{ 6,6 };
+  constexpr Layer_Shape a67{ 6,7 };
 
 
-  stack_neural_net<float, a3, a4, a2, a1> nn{};
+  stack_neural_net<float, a2, a2, a1> nn{};
   //
   //
-  std::cout << nn.layer<0>() << "\n";
-  std::cout << nn.layer<1>() << "\n";
-  std::cout << nn.layer<2>() << "\n";
-  std::cout << nn.layer<3>() << "\n";
 
+  stack_matrix<float, 2, 2> sm{ };
+
+  nn.print_layers();
+  
   nn.init<random::randnormal, 0, 1>();
 
-  std::cout << nn.layer<0>() << "\n";
-  std::cout << nn.layer<1>() << "\n";
-  std::cout << nn.layer<2>() << "\n";
-  std::cout << nn.layer<3>() << "\n";
+  nn.print_layers();
+
+  std::cout << "params: " << nn.parameters() << "\n";
+
+  sm.fill<random::randfloat>();
+  std::cout << "sm:" << sm << "\n";
+  std::cout << "Forward pass: " << nn.forward_pass(sm);
 
   //std::cout << l1.forward_pass(in);
 	return EXIT_SUCCESS;

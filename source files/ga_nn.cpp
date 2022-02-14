@@ -562,33 +562,33 @@ std::ostream& _ga_nn::operator<<(std::ostream& os, const neural_net& nn)
 	
 	int i = 0, j;
 
-	std::cout << "Head shape: " << "(" << _shape[i] << " , " << _shape[i + 1] << ")" << "\n";
-	std::cout << "Head size: " << _shape[i] * _shape[i+1] << "\n-------------------\n";
+	os << "Head shape: " << "(" << _shape[i] << " , " << _shape[i + 1] << ")" << "\n";
+  os << "Head size: " << _shape[i] * _shape[i+1] << "\n-------------------\n";
 
 	for (const _ga_nn::node& e : nn.get_head()->get()) {
-		std::cout << e.get() << std::endl; 
+    os << e.get() << std::endl;
 		s += (uint64_t)e.get().get_m() * (uint64_t)e.get().get_n();
 	}
 
 	for (i = 0, j = 2; i < nn.depth() - 1; ++i, j+=2) {
-		std::cout << "Hidden " << i << " shape: " << "(" << _shape[i + 2] << " , " << _shape[i + 3] << ")" << "\n";
-		std::cout << "Hidden " << i << " size: " << _shape[j] * _shape[j + 1] << "\n-------------------\n";
+    os << "Hidden " << i << " shape: " << "(" << _shape[i + 2] << " , " << _shape[i + 3] << ")" << "\n";
+    os << "Hidden " << i << " size: " << _shape[j] * _shape[j + 1] << "\n-------------------\n";
 		for (const _ga_nn::node& e : nn.get_hidden()[i]->get()) {
-			std::cout << e.get() << std::endl;
+      os << e.get() << std::endl;
 			s += (uint64_t)e.get().get_m() * (uint64_t)e.get().get_n();
 		}
 	}
 
-	std::cout << "Tail shape: " << "(" << _shape[j] << " , " << _shape[j + 1] << ")" << "\n";
-	std::cout << "Tail size: " << _shape[j] * _shape[j + 1] << "\n-------------------\n";
+  os << "Tail shape: " << "(" << _shape[j] << " , " << _shape[j + 1] << ")" << "\n";
+  os << "Tail size: " << _shape[j] * _shape[j + 1] << "\n-------------------\n";
 	for (const _ga_nn::node& e : nn.get_tail()->get()) {
-		std::cout << e.get() << std::endl;
+    os << e.get() << std::endl;
 		s += (uint64_t)e.get().get_m() * (uint64_t)e.get().get_n();
 	}
 
-	std::cout << "Net has " << s << " parameters\n\n";
+  os << "Net has " << s << " parameters\n\n";
 
-	std::cout << std::flush;
+  os << std::flush;
 	return os;
 }
 

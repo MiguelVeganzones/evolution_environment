@@ -576,7 +576,7 @@ namespace ga_sm {
     of L (which are unity) not stored. This must be a square n x n matrix.
     */
 
-    using namespace cx_helper_func;//constexpr abs
+    using cx_helper_func::cx_abs ;//constexpr abs
     using float_congruent_matrix = stack_matrix<float, N, N>;
 
     float_congruent_matrix Out{};
@@ -659,7 +659,7 @@ namespace ga_sm {
   [[nodiscard]] constexpr 
   bool RREF(stack_matrix<T, M, N>& Src) {
 
-    using namespace cx_helper_func; //constexpr abs
+    using cx_helper_func::cx_abs;//constexpr abs
 
     std::array<size_t, M> RIdx{};
     for (size_t i = 0; i < M; ++i) {
