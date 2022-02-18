@@ -1,9 +1,11 @@
 #pragma once
-#include "ga_stack_matrix.h"
+#include "ga_static_matrix.h"
 #include <iostream>
 #include <concepts>
 #include <array>
 #include <tuple>
+#include <fstream>
+#include <stdexcept>
 
 namespace ga_sm_nn {
   using namespace ga_sm;
@@ -39,7 +41,7 @@ namespace ga_sm_nn {
 
   //--------------------------------------------------------------------------------------//
 
-  template<class T, Layer_Structure Structure>
+  template<typename T, Layer_Structure Structure>
     requires std::is_floating_point<T>::value 
   class layer {
   private:
@@ -47,17 +49,17 @@ namespace ga_sm_nn {
     static constexpr size_t s_Inputs = Structure.Inputs;
     static constexpr size_t s_Outputs = Structure.Outputs;
 
-    stack_matrix<T, s_Inputs, s_Shape.size()> m_weigh_input_mat{};
-    stack_matrix<T, s_Outputs, s_Shape.size()> m_out_expand_mat{};
-    stack_matrix<T, s_Outputs, s_Shape.size()> m_out_offset_mat{};
+    static_matrix<T, s_Inputs, s_Shape.size()> m_weigh_input_mat{};
+    static_matrix<T, s_Outputs, s_Shape.size()> m_out_expand_mat{};
+    static_matrix<T, s_Outputs, s_Shape.size()> m_out_offset_mat{};
 
   public:
 
     //each neuron produces a column vector that splits into the input of the neurons in the next layer
     [[nodiscard]]constexpr 
-    stack_matrix<T, s_Outputs, s_Shape.size()> forward_pass(
-        const stack_matrix<T, s_Shape.size(), s_Inputs>& Input) const {
-      auto weighted_input = multiple_vector_mul(Input, m_weigh_input_mat);
+    static_matrix<T, s_Outputs, s_Shape.size()> forward_pass(
+        const static_matrix<T, s_Shape.size(), s_Inputs>& Input) const {
+      auto weighted_input = multiple_dot_product(Input, m_weigh_input_mat);
       return vector_expand(weighted_input, m_out_expand_mat) + m_out_offset_mat;
     }
 
@@ -68,32 +70,44 @@ namespace ga_sm_nn {
       m_out_offset_mat.fill<fn>(args...);
     }
 
+    void store(std::ofstream& out) const {
+      m_weigh_input_mat.store(out);
+      m_out_expand_mat.store(out);
+      m_out_offset_mat.store(out);
+    }
+
+    void load(std::ifstream& in) {
+      m_weigh_input_mat.load(in);
+      m_out_expand_mat.load(in);
+      m_out_offset_mat.load(in);
+    }
+
     inline constexpr 
-    const stack_matrix<T, s_Inputs, s_Shape.size()>& get_weigh_input_mat() const {
+    const static_matrix<T, s_Inputs, s_Shape.size()>& get_weigh_input_mat() const {
       return m_weigh_input_mat;
     }
 
     inline constexpr 
-    stack_matrix<T, s_Inputs, s_Shape.size()>& get_weigh_input_mat() {
+    static_matrix<T, s_Inputs, s_Shape.size()>& get_weigh_input_mat() {
       return m_weigh_input_mat;
     }
     
     inline constexpr 
-    const stack_matrix<T, s_Outputs, s_Shape.size()>& get_out_expand_mat() const {
+    const static_matrix<T, s_Outputs, s_Shape.size()>& get_out_expand_mat() const {
       return m_out_expand_mat;
     }
 
     inline constexpr 
-    stack_matrix<T, s_Outputs, s_Shape.size()>& get_out_expand_mat() {
+    static_matrix<T, s_Outputs, s_Shape.size()>& get_out_expand_mat() {
       return m_out_expand_mat;
     }
     
     inline constexpr 
-    const stack_matrix<T, s_Outputs, s_Shape.size()>& get_out_offset_mat() const {
+    const static_matrix<T, s_Outputs, s_Shape.size()>& get_out_offset_mat() const {
       return m_out_offset_mat;
     }
 
-    inline constexpr stack_matrix<T, s_Outputs, s_Shape.size()>& get_out_offset_mat() {
+    inline constexpr static_matrix<T, s_Outputs, s_Shape.size()>& get_out_offset_mat() {
       return m_out_offset_mat;
     }
 
@@ -110,7 +124,7 @@ namespace ga_sm_nn {
     }
   };
 
-  template<class T, Layer_Structure Structure>
+  template<typename T, Layer_Structure Structure>
   std::ostream& operator<<(
     std::ostream& os,
     const layer<T, Structure>& layer) {
@@ -127,12 +141,12 @@ namespace ga_sm_nn {
 
   //base template
   template<typename T, size_t Inputs, Layer_Shape...>
-  struct unroll;
+  struct layer_unroll;
 
 
   //specialization for last layer
   template<typename T, size_t Inputs, Layer_Shape Current_Shape>
-  struct unroll<T, Inputs, Current_Shape>
+  struct layer_unroll<T, Inputs, Current_Shape>
   {
     //-------- STATIC DATA ---------//
     static constexpr Layer_Shape s_Shape{ Current_Shape };
@@ -163,10 +177,18 @@ namespace ga_sm_nn {
       std::cout << m_Data << "\n";
     }
 
+    void store(std::ofstream& out) const {
+      m_Data.store(out);
+    }
+
+    void load(std::ifstream& in) {
+      m_Data.load(in);
+    }
+
     template<size_t Outputs>
       requires (Outputs == s_Outputs)
-    stack_matrix<T, s_Outputs, s_Shape.size()> forward_pass(
-        const stack_matrix<T, s_Shape.size(), s_Inputs>& input_data) const {
+    static_matrix<T, s_Outputs, s_Shape.size()> forward_pass(
+        const static_matrix<T, s_Shape.size(), s_Inputs>& input_data) const {
       return m_Data.forward_pass(input_data);
     }
 
@@ -174,7 +196,7 @@ namespace ga_sm_nn {
 
   //general specialization
   template<typename T, size_t Inputs, Layer_Shape Current_Shape, Layer_Shape... Shapes>
-  struct unroll<T, Inputs, Current_Shape, Shapes...>
+  struct layer_unroll<T, Inputs, Current_Shape, Shapes...>
   {
     //-------- STATIC DATA ---------//
     static constexpr Layer_Shape s_Shape{ Current_Shape };
@@ -187,7 +209,7 @@ namespace ga_sm_nn {
       s_Inputs,
       s_Outputs } > m_Data{}; // one data member for this layer
 
-    unroll<T, Current_Shape.size(), Shapes...> m_Next; //another unroll member for the rest
+    layer_unroll<T, Current_Shape.size(), Shapes...> m_Next; //another layer_unroll member for the rest
 
     //------ MEMBER FUNCTIONS -----//
     //getter so that we can actually get a specific layer by index
@@ -212,18 +234,28 @@ namespace ga_sm_nn {
       m_Next.print();
     }
 
+    void store(std::ofstream& out) const {
+      m_Data.store(out);
+      m_Next.store(out);
+    }
+
+    void load(std::ifstream& in) {
+      m_Data.load(in);
+      m_Next.load(in);
+    }
+
     template<size_t Outputs>
-    stack_matrix<T, 1, Outputs> forward_pass(
-        const stack_matrix<T, s_Shape.size(), s_Inputs>& input_data) const {
+    static_matrix<T, 1, Outputs> forward_pass(
+        const static_matrix<T, s_Shape.size(), s_Inputs>& input_data) const {
       return m_Next.forward_pass<Outputs>(m_Data.forward_pass(input_data));
     }
   };
 
   //--------------------------------------------------------------------------------------//
 
-  //template<class T, Layer_Structure... Structures>
+  //template<typename T, Layer_Structure... Structures>
   //  requires ((sizeof...(Structures) >= 3) and std::is_floating_point<T>::value)
-  //class stack_neural_net {
+  //class static_neural_net {
   //public:
   //  static constexpr size_t s_Layers{ sizeof...(Structures) };
   //  static constexpr std::array<Layer_Structure, s_Layers> s_Structures{ Structures... };
@@ -231,15 +263,15 @@ namespace ga_sm_nn {
   //  std::tuple<layer<T, s_Structures>> m_Layers{};
   //};
 
-  template<class T, Layer_Shape... Shapes>
+  template<typename T, Layer_Shape... Shapes>
     requires ((sizeof...(Shapes) >= 3) and std::is_floating_point<T>::value)
-  class stack_neural_net {
+  class static_neural_net {
   private:
     static constexpr size_t s_Layers{ sizeof...(Shapes) };
     static constexpr std::array<Layer_Shape, s_Layers> s_Shapes{ Shapes... };
     static constexpr Layer_Shape s_Out_Shape{ s_Shapes[s_Layers - 1] };
 
-    unroll<T, 1, Shapes...> m_Layers{};
+    layer_unroll<T, 1, Shapes...> m_Layers{};
 
   public:
 
@@ -268,15 +300,57 @@ namespace ga_sm_nn {
     }
 
     void print_net() const {
+      std::cout << "##########################################################################\n";
       print_layers();
+      std::cout << "--------------------------------------------------------------------------\n";
+    }
+
+    void store(const std::string& filename) const {
+      std::ofstream out(filename);
+      if (!out.is_open()) {
+        std::cout << "Cound not create file: " + filename + "\n";
+        exit(EXIT_FAILURE);
+      }
+      //store net shapes
+      for (const auto& shape : s_Shapes) {
+        out << shape.M << " " << shape.N << " ";
+      }
+      out << "\n\n";
+      //Store layers recursively
+      m_Layers.store(out);
+
+      out.close();
+    }
+
+    //Overrides current net with one read from "filename"
+    //Shapes of both nets must be the same
+    void load(const std::string& filename) {
+      std::ifstream in(filename);
+      if (!in.is_open()) {
+        std::cout << "Cound not open file: " + filename + "\n";
+        exit(EXIT_FAILURE);
+      }
+
+      size_t m{}, n{}; //shape
+      for (const auto& e : s_Shapes) {
+        in >> m >> n;
+        if (m != e.M or n != e.N){
+          std::cout << "Cannot load this net here. Shapes must match\n";
+          exit(EXIT_FAILURE);
+        }
+      }
+      //load layers recursively
+      m_Layers.load(in);
+
+      in.close();
     }
 
     template<size_t M, size_t N>
       requires (Layer_Shape{ M, N } == s_Shapes[0])
-    stack_matrix<T, 1, s_Out_Shape.size()> forward_pass(
-        const stack_matrix<T, M, N>& input_data) const {
+    static_matrix<T, 1, s_Out_Shape.size()> forward_pass(
+        const static_matrix<T, M, N>& input_data) const {
       //format input
-      stack_matrix<T, s_Shapes[0].size(), 1> Temp{};
+      static_matrix<T, s_Shapes[0].size(), 1> Temp{};
       for (size_t j = 0; j < M; ++j) {
         for (size_t i = 0; i < N; ++i) {
           Temp(j * N + i, 0) = input_data(j, i);
@@ -284,14 +358,61 @@ namespace ga_sm_nn {
       }
       return m_Layers.forward_pass<s_Out_Shape.size()>(Temp);
     }
-
   };
 
   //--------------------------------------------------------------------------------------//
-
+  //               Functionality
   //--------------------------------------------------------------------------------------//
 
 
+
+  template<typename T, Layer_Structure Structure>
+  std::pair<layer<T, Structure>, layer<T, Structure>> in_place_layer_x_crossover(
+      layer<T, Structure>& layer1,
+      layer<T, Structure>& layer2) {
+    
+    in_place_x_crossover(layer1.get_weigh_input_mat(),
+                         layer2.get_weigh_input_mat());
+
+    in_place_x_crossover(layer1.get_out_expand_mat(),
+                         layer2.get_out_expand_mat());
+    
+    in_place_x_crossover(layer1.get_out_offset_mat(),
+                         layer2.get_out_offset_mat());
+
+    return std::make_pair(layer1, layer2);
+  }
+
+  //neural net x_crossover
+
+  template<typename T, Layer_Shape... Shapes>
+  std::pair< static_neural_net<T, Shapes...>, static_neural_net<T, Shapes...>> x_crossover(
+      static_neural_net<T, Shapes...> const& net1, 
+      static_neural_net<T, Shapes...> const& net2) {
+
+    static_neural_net<T, Shapes...> ret_net1{ net1 };
+    static_neural_net<T, Shapes...> ret_net2{ net2 };
+    //Recursivelly crossover layers
+    in_place_net_x_crossover<0>(ret_net1, ret_net2);
+    return std::make_pair(ret_net1, ret_net2);
+  }
+
+  template<size_t I, typename T, Layer_Shape... Shapes>
+    requires (I != sizeof...(Shapes) - 1)
+  void in_place_net_x_crossover(
+      static_neural_net<T, Shapes...>& temp_net1,
+      static_neural_net<T, Shapes...>& temp_net2) {
+    in_place_layer_x_crossover(temp_net1.layer<I>(), temp_net2.layer<I>());
+    in_place_net_x_crossover<I + 1>(temp_net1, temp_net2);
+  }
+
+  template<size_t I, typename T, Layer_Shape... Shapes>
+    requires (I == sizeof...(Shapes) - 1)
+  void in_place_net_x_crossover(
+      static_neural_net<T, Shapes...>& temp_net1,
+      static_neural_net<T, Shapes...>& temp_net2) {
+    in_place_layer_x_crossover(temp_net1.layer<I>(), temp_net2.layer<I>());
+  }
 
 
 }

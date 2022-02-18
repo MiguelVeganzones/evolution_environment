@@ -14,7 +14,7 @@ namespace _c4_brain {
 		uint_fast32_t ID = ++s_ID;
 		std::vector<uint_fast8_t> shape;
 //static variable
-		static uint_fast32_t s_ID;
+    static uint_fast32_t s_ID;
 
 	public:
 		c4_brain(const std::vector<uint_fast8_t>& _shape);

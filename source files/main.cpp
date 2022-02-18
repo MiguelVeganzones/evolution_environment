@@ -5,7 +5,8 @@
 #include "stopwatch.h"
 #include "c4_brain.h"
 #include "Random.h"
-#include "ga_stack_nn.h"
+#include "ga_static_nn.h"
+#include "ga_static_matrix.h"
 
 int main0() {
 	//probar operator() board
@@ -486,12 +487,11 @@ int main16() {
 	return EXIT_SUCCESS;
 }
 
-#include "ga_stack_matrix.h"
 int main17() {
 	stopwatch s;
 
 	random::init();
-	ga_sm::stack_matrix<int, 15, 10> sm;
+	ga_sm::static_matrix<int, 15, 10> sm;
 
 	sm.fill<random::randint>(0 ,10);
 
@@ -515,10 +515,10 @@ int main18() {
 
 	random::init();
 
-	stack_matrix<float, 10, 10> sm1;
+	static_matrix<float, 10, 10> sm1;
 	sm1.fill<random::randfloat>();
 
-	stack_matrix<float, 10, 10> sm2;
+	static_matrix<float, 10, 10> sm2;
 	sm2.fill<random::randfloat>();
 
 	std::cout << sm1 << std::endl;
@@ -548,13 +548,13 @@ int main19() {
 		std::cout << "stack\n";
 		stopwatch s;
 
-		stack_matrix<float, N, N> sm1;
-		stack_matrix<float, N, N> sm2;
+		static_matrix<float, N, N> sm1;
+		static_matrix<float, N, N> sm2;
 		//sm3;
 
 		sm1.fill<random::randfloat>();
 		sm2.fill<random::randfloat>();
-		stack_matrix<float, N, N> sm3 = matrix_mul(sm1, sm2);
+		static_matrix<float, N, N> sm3 = matrix_mul(sm1, sm2);
 
 		std::cout << sm3(0, 0) << std::endl;
 		
@@ -593,12 +593,12 @@ int main20() {
 		std::cout << "heap\n";
 		stopwatch s;
 		
-		auto sm1 = std::make_unique<stack_matrix<float, N, N>>();
-		auto sm2 = std::make_unique<stack_matrix<float, N, N>>();
+		auto sm1 = std::make_unique<static_matrix<float, N, N>>();
+		auto sm2 = std::make_unique<static_matrix<float, N, N>>();
 
 		sm1->fill<random::randfloat>();
 		sm2->fill<random::randfloat>();
-		auto sm3 = std::make_unique<stack_matrix<float, N, N>>
+		auto sm3 = std::make_unique<static_matrix<float, N, N>>
 			(matrix_mul(*sm1, *sm2));
 
 		std::cout << (*sm3)(0, 0) << std::endl;
@@ -615,7 +615,7 @@ int main21() {
 
 	//std::cout << sm1 << std::endl;
 
-	stack_matrix<float, N, N+1> sm1;
+	static_matrix<float, N, N+1> sm1;
 	
 	sm1.fill<random::randfloat>();
 	std::cout << sm1 << std::endl;
@@ -634,8 +634,8 @@ constexpr bool main22() {
 	constexpr size_t N = 4;
 
 	
-	stack_matrix<int, N, N> sm1{};
-	stack_matrix<double, N, N> sm2{}, sm3{};
+	static_matrix<int, N, N> sm1{};
+	static_matrix<double, N, N> sm2{}, sm3{};
 
 	sm1 = { 1,2,3,4,5,6,7,8,9,10,11,1,13,4,5,6 };
 	sm2 = cast_to<double>(sm1);
@@ -656,13 +656,13 @@ constexpr bool main22() {
 bool main23() {
 	using namespace ga_sm;
 
-	using T = stack_matrix<float, 5, 5>;
+	using T = static_matrix<float, 5, 5>;
 
 	std::cout << std::is_trivial<T>::value;
 	std::cout << std::is_trivially_copyable<T>::value;
 	std::cout << std::is_standard_layout<T>::value;
 
-	using A = stack_matrix<int, 5, 5>;
+	using A = static_matrix<int, 5, 5>;
 
 	std::cout << std::is_trivial<A>::value;
 	std::cout << std::is_trivially_copyable<A>::value;
@@ -679,8 +679,8 @@ bool main24() {
 	constexpr size_t N = 4;
 
 
-  stack_matrix<int, N, N> sm1;
-	stack_matrix<double, N, N> sm2{}, sm3{}, sm11{}, sm12{};
+  static_matrix<int, N, N> sm1;
+	static_matrix<double, N, N> sm2{}, sm3{}, sm11{}, sm12{};
 
 	sm1 = { 1,2,3,4,5,6,7,8,9,10,11,1,13,4,5,6 };
   sm12 = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 };
@@ -706,7 +706,7 @@ bool main24() {
 int matrix_mul_bench() {
   using namespace ga_sm;
   constexpr size_t N = 30;
-  stack_matrix<float, N, N> sm1{}, sm2{}, sm3{}, sm4{};
+  static_matrix<float, N, N> sm1{}, sm2{}, sm3{}, sm4{};
 
   {
     stopwatch s;
@@ -727,14 +727,15 @@ int matrix_mul_bench() {
 
 int main() {
 
+  //random::init();
   stopwatch s0;
   using namespace ga_sm_nn;
   //constexpr ga_sm_nn::Matrix_Size a1{ 2,2 };
   //constexpr ga_sm_nn::Matrix_Size a2{ 4,4 };
 
-  //ga_sm_nn::stack_neural_net<float, a1, a2 , a2> nn{};
+  //ga_sm_nn::static_neural_net<float, a1, a2 , a2> nn{};
 
-  ga_sm::stack_matrix<float, 3, 6> in{};
+  ga_sm::static_matrix<float, 2, 2> in{};
   in.fill<random::randfloat>();
 
   //ga_sm_nn::layer<float, ga_sm_nn::Layer_Shape{ 3,1 }, 6, 4> l1{};
@@ -753,24 +754,32 @@ int main() {
   constexpr Layer_Shape a67{ 6,7 };
 
 
-  stack_neural_net<float, a2, a2, a1> nn{};
+  static_neural_net<float, a2, a2, a1> nn1{}, nn2;
   //
   //
 
-  stack_matrix<float, 2, 2> sm{ };
 
-  nn.print_layers();
-  
-  nn.init<random::randnormal, 0, 1>();
+  nn1.init<random::randnormal, 0, 1>();
+  nn2.init<random::randnormal, 0, 1>();
 
-  nn.print_layers();
+  auto ret = x_crossover(nn1, nn2);
 
-  std::cout << "params: " << nn.parameters() << "\n";
+  //nn1.print_net();
+  //nn2.print_net();
+  //ret.first.print_net();
+  //ret.second.print_net();
 
-  sm.fill<random::randfloat>();
-  std::cout << "sm:" << sm << "\n";
-  std::cout << "Forward pass: " << nn.forward_pass(sm);
+  static_neural_net<float, a2, a2, a1> nn3{};
 
-  //std::cout << l1.forward_pass(in);
-	return EXIT_SUCCESS;
+  nn2.store("prueba0.txt");
+  nn3.load("prueba0.txt");
+
+  nn3.print_net();
+
+  std::cout << nn3.parameters() << "\n";
+  {
+    stopwatch s1;
+    std::cout << nn3.forward_pass(in);
+  }
+  return EXIT_SUCCESS;
 }
