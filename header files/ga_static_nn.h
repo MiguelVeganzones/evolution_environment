@@ -27,18 +27,6 @@ namespace ga_sm_nn {
     constexpr bool operator==(const Layer_Structure&) const = default;
   };
 
-  template<Layer_Shape... Shapes, size_t Size = sizeof...(Shapes)>
-  constexpr [[nodiscard]]
-  std::array<Layer_Structure, Size> get_structure() {
-    std::array<Layer_Structure, Size> Ret{};
-    std::array<Layer_Shape, Size+2> Temp{ Layer_Shape{1,1}, Shapes..., Layer_Shape{1,1} };
-
-    for (size_t i = 1; i < Size+1; ++i) {
-      Ret[i] = Layer_Structure{ Temp[i], Temp[i - 1].size() , Temp[i + 1].size()};
-    }
-    return Ret;
-  }
-
   //--------------------------------------------------------------------------------------//
 
   template<typename T, Layer_Structure Structure>
@@ -49,17 +37,22 @@ namespace ga_sm_nn {
     static constexpr size_t s_Inputs = Structure.Inputs;
     static constexpr size_t s_Outputs = Structure.Outputs;
 
-    static_matrix<T, s_Inputs, s_Shape.size()> m_weigh_input_mat{};
-    static_matrix<T, s_Outputs, s_Shape.size()> m_out_expand_mat{};
-    static_matrix<T, s_Outputs, s_Shape.size()> m_out_offset_mat{};
+  public:
+    using input_mat_shape = static_matrix<T, s_Inputs, s_Shape.size()>;
+    using output_mat_shape = static_matrix<T, s_Outputs, s_Shape.size()>;
+
+  private:
+    input_mat_shape m_weigh_input_mat{};
+    output_mat_shape m_out_expand_mat{};
+    output_mat_shape m_out_offset_mat{};
 
   public:
-
     //each neuron produces a column vector that splits into the input of the neurons in the next layer
     [[nodiscard]]constexpr 
-    static_matrix<T, s_Outputs, s_Shape.size()> forward_pass(
+    output_mat_shape forward_pass(
         const static_matrix<T, s_Shape.size(), s_Inputs>& Input) const {
-      auto weighted_input = multiple_dot_product(Input, m_weigh_input_mat);
+
+      const auto weighted_input = multiple_dot_product(Input, m_weigh_input_mat);
       return vector_expand(weighted_input, m_out_expand_mat) + m_out_offset_mat;
     }
 
@@ -83,31 +76,32 @@ namespace ga_sm_nn {
     }
 
     inline constexpr 
-    const static_matrix<T, s_Inputs, s_Shape.size()>& get_weigh_input_mat() const {
+    const input_mat_shape& get_weigh_input_mat() const {
       return m_weigh_input_mat;
     }
 
     inline constexpr 
-    static_matrix<T, s_Inputs, s_Shape.size()>& get_weigh_input_mat() {
+    input_mat_shape& get_weigh_input_mat() {
       return m_weigh_input_mat;
     }
     
     inline constexpr 
-    const static_matrix<T, s_Outputs, s_Shape.size()>& get_out_expand_mat() const {
+    const output_mat_shape& get_out_expand_mat() const {
       return m_out_expand_mat;
     }
 
     inline constexpr 
-    static_matrix<T, s_Outputs, s_Shape.size()>& get_out_expand_mat() {
+    output_mat_shape& get_out_expand_mat() {
       return m_out_expand_mat;
     }
     
     inline constexpr 
-    const static_matrix<T, s_Outputs, s_Shape.size()>& get_out_offset_mat() const {
+    const output_mat_shape& get_out_offset_mat() const {
       return m_out_offset_mat;
     }
 
-    inline constexpr static_matrix<T, s_Outputs, s_Shape.size()>& get_out_offset_mat() {
+    inline constexpr 
+    output_mat_shape& get_out_offset_mat() {
       return m_out_offset_mat;
     }
 
@@ -126,11 +120,12 @@ namespace ga_sm_nn {
 
   template<typename T, Layer_Structure Structure>
   std::ostream& operator<<(
-    std::ostream& os,
-    const layer<T, Structure>& layer) {
+      std::ostream& os,
+      const layer<T, Structure>& layer) {
+
     os << layer.get_weigh_input_mat() <<
-      layer.get_out_expand_mat() <<
-      layer.get_out_offset_mat() << "\n";
+          layer.get_out_expand_mat() <<
+          layer.get_out_offset_mat() << "\n";
     return os;
   }
 
@@ -148,12 +143,10 @@ namespace ga_sm_nn {
   template<typename T, size_t Inputs, Layer_Shape Current_Shape>
   struct layer_unroll<T, Inputs, Current_Shape>
   {
-    //-------- STATIC DATA ---------//
     static constexpr Layer_Shape s_Shape{ Current_Shape };
     static constexpr size_t s_Inputs{ Inputs };
     static constexpr size_t s_Outputs{ 1 };
 
-    //-------- DATA MEMBERS -------//
     layer < T, Layer_Structure{ Current_Shape, Inputs, 1 } > m_Data{}; // one data member for this layer
 
     //------ MEMBER FUNCTIONS -----//
@@ -302,6 +295,7 @@ namespace ga_sm_nn {
     void print_net() const {
       std::cout << "##########################################################################\n";
       print_layers();
+      std::cout << "Net has " << parameters() << " parameters\n";
       std::cout << "--------------------------------------------------------------------------\n";
     }
 
@@ -316,9 +310,7 @@ namespace ga_sm_nn {
         out << shape.M << " " << shape.N << " ";
       }
       out << "\n\n";
-      //Store layers recursively
-      m_Layers.store(out);
-
+      m_Layers.store(out); //Store layers recursively
       out.close();
     }
 
@@ -330,7 +322,6 @@ namespace ga_sm_nn {
         std::cout << "Cound not open file: " + filename + "\n";
         exit(EXIT_FAILURE);
       }
-
       size_t m{}, n{}; //shape
       for (const auto& e : s_Shapes) {
         in >> m >> n;
@@ -339,18 +330,16 @@ namespace ga_sm_nn {
           exit(EXIT_FAILURE);
         }
       }
-      //load layers recursively
-      m_Layers.load(in);
-
+      m_Layers.load(in); //load layers recursively
       in.close();
     }
 
     template<size_t M, size_t N>
       requires (Layer_Shape{ M, N } == s_Shapes[0])
     static_matrix<T, 1, s_Out_Shape.size()> forward_pass(
-        const static_matrix<T, M, N>& input_data) const {
-      //format input
-      static_matrix<T, s_Shapes[0].size(), 1> Temp{};
+        static_matrix<T, M, N> const& input_data) const {
+
+      static_matrix<T, s_Shapes[0].size(), 1> Temp{}; //format input
       for (size_t j = 0; j < M; ++j) {
         for (size_t i = 0; i < N; ++i) {
           Temp(j * N + i, 0) = input_data(j, i);

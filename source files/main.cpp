@@ -690,8 +690,6 @@ bool main24() {
 
 	bool b{ 0 };
   std::cout << sm2 << std::endl;
-  sm2.transposed();
-  std::cout << sm2 << std::endl;
 
 	if (inverse(sm2, sm3)) {
 		std::cout << sm3 << std::endl;

@@ -46,6 +46,8 @@ do not cover corner cases.
 Code bloat could be an issue if using multiple types of matrices (shapes and value types). This has not 
 been taken into account during design.
 
+I decided to use - T const& - in most cases because i found it easier to read due to long names 
+
 */
 
 namespace ga_sm {
@@ -288,15 +290,6 @@ namespace ga_sm {
       }
     }
 
-    //in place transpose operator
-    constexpr void transposed() noexcept {
-      for (size_t j = 0; j < M - 1; ++j) {
-        for (size_t i = j + 1; i < N; ++i) {
-          std::swap(this->operator()(j, i), this->operator()(i, j));
-        }
-      }
-    }
-
     /*
     Each element of the matrix might be:
       Modified by a normal distribution given by [Avg, Stddev] with a probability of p1: // e += randnormal(avg, stddev)
@@ -347,7 +340,7 @@ namespace ga_sm {
       return m_Elems[j * N + i];
     }
 
-    [[nodiscard]] constexpr row_matrix operator[](size_t j) const {
+    [[nodiscard]] constexpr row_matrix operator[](const size_t j) const {
       assert(j < M);
       row_matrix Ret{};
       const_iterator It(m_Elems, j * N);
@@ -442,10 +435,9 @@ namespace ga_sm {
 
   template<typename T2, typename T1, size_t M, size_t N>
   [[nodiscard]] constexpr
-    static_matrix<T2, M, N> cast_to(static_matrix<T1, M, N> const& Src) {
+  static_matrix<T2, M, N> cast_to(static_matrix<T1, M, N> const& Src) {
 
     static_matrix<T2, M, N> Ret{};
-
     for (size_t j = 0; j < M; ++j) {
       for (size_t i = 0; i < N; ++i) {
         Ret(j, i) = static_cast<T2>(Src(j, i));
@@ -499,8 +491,8 @@ namespace ga_sm {
   template<typename T, size_t M, size_t N>
   [[nodiscard]] constexpr
     bool nearly_equals(
-      const static_matrix<T, M, N>& Mat1,
-      const static_matrix<T, M, N>& Mat2,
+      static_matrix<T, M, N> const& Mat1,
+      static_matrix<T, M, N> const& Mat2,
       const T epsilon = 1e-4) {
 
     T d{};
@@ -808,7 +800,7 @@ namespace ga_sm {
       Tmp(j, j + N) = 1;
     }
 
-    bool Invertible{ 0 };
+    bool Invertible{};
 
     if (Invertible = RREF(Tmp)) {
       for (size_t j = 0; j < N; ++j) {
@@ -887,9 +879,7 @@ namespace ga_sm {
       const std::same_as<static_matrix<T, M, N>> auto& ... Mats) {
     return (Mats + ...) / sizeof...(Mats);
   }
+
+
 } /* namespace ga_sm */
-
-
-
-
 
