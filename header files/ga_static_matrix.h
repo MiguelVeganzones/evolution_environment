@@ -52,8 +52,6 @@ I decided to use - T const& - in most cases because i found it easier to read du
 
 namespace ga_sm {
 
-  using namespace ga_sm;
-
   template <typename T, size_t Size>
   class matrix_const_iterator {
   public:
@@ -407,7 +405,8 @@ namespace ga_sm {
       assert(std::is_floating_point<T>::value);
       assert(Norm != 0.f);
       const T Sum = sum();
-      for (auto& e : *this) e /= Sum;
+      const T factor = Norm / Sum;
+      for (auto& e : *this) e *= factor;
     }
 
     //Ofstream file should be closed outside of this function
@@ -542,7 +541,6 @@ namespace ga_sm {
     size_t Area2 = M * N - Area1;
 
     bool D = Area1 < Area2; //block diagonal to swap. True for main diagonal, false for anti diagonal 
-    int count = 0;
 
     //swap first block
     for (size_t j = 0; j < a; ++j) {
@@ -690,7 +688,7 @@ namespace ga_sm {
       for (size_t j = p + 1; j < N; ++j) {
         Out(RIdx[j], p) /= Out(RIdx[p], p);
         // Eliminate [p].
-        for (int i = p + 1; i < N; ++i) {
+        for (size_t i = p + 1; i < N; ++i) {
           Out(RIdx[j], i) -= Out(RIdx[j], p) * Out(RIdx[p], i);
         }
       }

@@ -491,7 +491,7 @@ int main17() {
 	stopwatch s;
 
 	random::init();
-	ga_sm::static_matrix<int, 15, 10> sm;
+  ga_sm::static_matrix<int, 15, 10> sm{};
 
 	sm.fill<random::randint>(0 ,10);
 

@@ -57,7 +57,7 @@ namespace ga_sm_nn {
     }
 
     template<auto fn, auto... args>
-    constexpr void init(const T scale = 1, const T offset = 0) {
+    constexpr void init() {
       m_weigh_input_mat.fill<fn>(args...);
       m_out_expand_mat.fill<fn>(args...);
       m_out_offset_mat.fill<fn>(args...);
