@@ -4,6 +4,10 @@
 #include "nn_helper_functions.h"
 #include <concepts>
 #include <stdexcept>
+#include <cstring>
+#include <immintrin.h>
+#include <bit>
+
 /*
 based on:
   msvc implementation of std::array
@@ -56,7 +60,6 @@ namespace ga_sm {
   class matrix_const_iterator {
   public:
     using value_type       = T;
-    using ptrdiff          = long long;
     using pointer          = const T*;
     using reference        = const T&;
 
@@ -98,33 +101,33 @@ namespace ga_sm {
       return Tmp;
     }
 
-    constexpr matrix_const_iterator& operator+=(const ptrdiff Offs) noexcept {
+    constexpr matrix_const_iterator& operator+=(const ptrdiff_t Offs) noexcept {
       m_Ptr += Offs;
       return *this;
     }
 
-    [[nodiscard]] constexpr matrix_const_iterator operator+(const ptrdiff Offs) const noexcept {
+    [[nodiscard]] constexpr matrix_const_iterator operator+(const ptrdiff_t Offs) const noexcept {
       matrix_const_iterator Tmp = *this;
       Tmp += Offs;
       return Tmp;
     }
 
-    constexpr matrix_const_iterator& operator-=(const ptrdiff Offs) noexcept {
+    constexpr matrix_const_iterator& operator-=(const ptrdiff_t Offs) noexcept {
       m_Ptr -= Offs;
       return *this;
     }
 
-    [[nodiscard]] constexpr matrix_const_iterator operator-(const ptrdiff Offs) const noexcept {
+    [[nodiscard]] constexpr matrix_const_iterator operator-(const ptrdiff_t Offs) const noexcept {
       matrix_const_iterator Tmp = *this;
       Tmp -= Offs;
       return Tmp;
     }
 
-    [[nodiscard]] constexpr ptrdiff operator-(const matrix_const_iterator& Rhs) const noexcept {
+    [[nodiscard]] constexpr ptrdiff_t operator-(const matrix_const_iterator& Rhs) const noexcept {
       return m_Ptr - Rhs.m_Ptr;
     }
 
-    [[nodiscard]] constexpr reference operator[](const ptrdiff Offs) const noexcept {
+    [[nodiscard]] constexpr reference operator[](const ptrdiff_t Offs) const noexcept {
       return m_Ptr[Offs];
     }
 
@@ -163,7 +166,6 @@ namespace ga_sm {
   public:
     using Mybase = matrix_const_iterator<T, Size>;
     using value_type        = T;
-    using ptrdiff           = long long;
     using pointer           = T*;
     using reference         = T&;
 
@@ -201,29 +203,29 @@ namespace ga_sm {
       return Tmp;
     }
 
-    constexpr matrix_iterator& operator+=(const ptrdiff Offs) noexcept {
+    constexpr matrix_iterator& operator+=(const ptrdiff_t Offs) noexcept {
       Mybase::operator+=(Offs);
       return *this;
     }
 
-    [[nodiscard]] constexpr matrix_iterator operator+(const ptrdiff Offs) const noexcept {
+    [[nodiscard]] constexpr matrix_iterator operator+(const ptrdiff_t Offs) const noexcept {
       matrix_iterator Tmp = *this;
       Tmp += Offs;
       return Tmp;
     }
 
-    constexpr matrix_iterator& operator-=(const ptrdiff Offs) noexcept {
+    constexpr matrix_iterator& operator-=(const ptrdiff_t Offs) noexcept {
       Mybase::operator-=(Offs);
       return *this;
     }
 
-    [[nodiscard]] constexpr matrix_iterator operator-(const ptrdiff Offs) const noexcept {
+    [[nodiscard]] constexpr matrix_iterator operator-(const ptrdiff_t Offs) const noexcept {
       matrix_iterator Tmp = *this;
       Tmp -= Offs;
       return Tmp;
     }
 
-    [[nodiscard]] constexpr reference operator[](const ptrdiff Offs) const noexcept {
+    [[nodiscard]] constexpr reference operator[](const ptrdiff_t Offs) const noexcept {
       return const_cast<reference>(Mybase::operator[](Offs));
     }
 
@@ -236,15 +238,12 @@ namespace ga_sm {
 
   //-------------------------------------------------------------------//
 
-
-
   template <typename T, size_t M, size_t N>
-    requires std::is_arithmetic<T>::value
+    requires std::is_arithmetic_v<T>
   class static_matrix {
   public:
     using value_type            = T;
     using size_type             = size_t;
-    using ptrdiff               = long long;
     using pointer               = T*;
     using const_pointer         = const T*;
     using reference             = T&;
@@ -270,7 +269,7 @@ namespace ga_sm {
       }
     }
 
-    constexpr void fill_n(const iterator& Dest, const ptrdiff Count, const T Val) {
+    constexpr void fill_n(const iterator& Dest, const ptrdiff_t Count, const T Val) {
 #ifdef _CHECKBOUNDS_
       bool indexing_b = *Dest < *m_Elems; //Pointer before array
       bool indexing_p = *Dest + Count > *m_Elems + M * N; //write past array limits
@@ -283,7 +282,7 @@ namespace ga_sm {
 #endif
 
       iterator Curr(Dest);
-      for (ptrdiff i = 0; i < Count; ++i, ++Curr) {
+      for (ptrdiff_t i = 0; i < Count; ++i, ++Curr) {
         *Curr = Val;
       }
     }
@@ -291,11 +290,11 @@ namespace ga_sm {
     /*
     Each element of the matrix might be:
       Modified by a normal distribution given by [Avg, Stddev] with a probability of p1: // e += randnormal(avg, stddev)
-      Replaced by a value given by fn scaled by Ampl2 with a probability of p2-p1: // e = (fn(args...) + offset) * ampl
+      Replaced by a value given by fn scaled by Ampl2 with a probability of p2-p1: // e = fn(args...)
     */
     template<auto fn, auto... args>
-      requires std::is_floating_point<T>::value
-    void mutate(float Avg, float Stddev, float p1, float p2, float Ampl = 1, float Offset = -0.5) {
+      requires std::is_floating_point_v<T>
+    void mutate(float Avg, float Stddev, float p1, float p2) {
       assert(p2 >= p1);
 
       float Rand;
@@ -305,7 +304,7 @@ namespace ga_sm {
           *Curr += static_cast<T>(random::randnormal(Avg, Stddev));
         }
         else if (Rand < p2) {
-          *Curr = static_cast<T>((static_cast<float>(fn(args...)) + Offset) * Ampl);
+          *Curr = static_cast<T>(fn(args...));
         }
       }
     }
@@ -401,8 +400,8 @@ namespace ga_sm {
     }
 
     //only works for float-like types
-    constexpr void rescale_L_1_1_norm(const float Norm = 1.f) {
-      assert(std::is_floating_point<T>::value);
+    constexpr void rescale_L_1_1_norm(const float Norm = 1.f) 
+        requires std::is_floating_point_v<T> {
       assert(Norm != 0.f);
       const T Sum = sum();
       const T factor = Norm / Sum;
@@ -445,6 +444,16 @@ namespace ga_sm {
     return Ret;
   }
 
+  template<size_t Out_M, size_t Out_N, typename T, size_t M, size_t N>
+    requires (M * N == Out_M * Out_N)
+  [[nodiscard]] constexpr
+  static_matrix<T, Out_M, Out_N> cast_to_shape(static_matrix<T, M, N> const& Src) {
+
+    static_matrix<T, Out_M, Out_N> Ret{};
+    std::memcpy(Ret.m_Elems, Src.m_Elems, N * M * sizeof(T));
+    return Ret;
+  }
+
   template<typename T, size_t M, size_t N>
   std::ostream& operator<<(
       std::ostream& os, 
@@ -476,7 +485,7 @@ namespace ga_sm {
   bool operator==(
       static_matrix<T, M, N> const& Mat1,
       static_matrix<T, M, N> const& Mat2) {
-    return std::is_integral<T>::value ? exactly_equals(Mat1, Mat2) : nearly_equals(Mat1, Mat2);
+    return std::is_integral_v<T> ? exactly_equals(Mat1, Mat2) : nearly_equals(Mat1, Mat2);
   }
 
   template<typename T, size_t M, size_t N>
@@ -557,15 +566,15 @@ namespace ga_sm {
     }
   }
 
-  template<typename T, size_t M, size_t N>
+  template<typename Matrix>
   [[nodiscard]]
-  std::pair<static_matrix<T, M, N>, static_matrix<T, M, N>> x_crossover(
-    static_matrix<T, M, N> const& Mat1,
-    static_matrix<T, M, N> const& Mat2) {
+  std::pair<Matrix, Matrix> x_crossover(
+    Matrix const& Mat1,
+    Matrix const& Mat2) {
 
     //setup return matrices.
-    static_matrix<T, M, N> Ret1(Mat1);
-    static_matrix<T, M, N> Ret2(Mat2);
+    Matrix Ret1(Mat1);
+    Matrix Ret2(Mat2);
 
     in_place_x_crossover(Ret1, Ret2);
 
@@ -588,6 +597,37 @@ namespace ga_sm {
       }
     }
     return Ret;
+  }
+
+  /*
+  Beneficios observados a partir de 40x40
+  */
+  template<size_t M, size_t N>
+  [[nosidcard]] 
+  static_matrix<float, M, 1> matrix_vector_mul_float_avx(
+      static_matrix<float, M, N> const& mat,
+      static_matrix<float, N, 1> const& vec) {
+
+    static_matrix<float, M, 1> ret{};
+    for (size_t i = 0; i < N - 7; i += 8) {
+      __m256 v_piece = _mm256_loadu_ps(vec.m_Elems + i);
+      for (size_t j = 0; j < M; ++j) {
+        __m256 row_piece = _mm256_loadu_ps(mat.m_Elems + i + j * N);
+        __m256 m256_dot_piece = _mm256_dp_ps(v_piece, row_piece, 0xf1); //compare 0xff with 0xf1
+        auto float8_dot_piece = std::bit_cast<std::array<float, 8>>(m256_dot_piece);
+        ret(j, 0) += float8_dot_piece[0] + float8_dot_piece[4]; //Now without UB! std::bit_cast edition
+      }                                                  
+    }
+    //last iterations (lower 3 bits of N)
+    if constexpr (N % 8 != 0) {
+      constexpr size_t iters_completed = ( N & (~size_t(7)) );
+      for (size_t ii = iters_completed; ii < N; ++ii) {
+        for (size_t j = 0; j < M; ++j) {
+          ret(j, 0) += mat(j, ii) * vec(ii, 0);
+        }
+      }
+    }
+    return ret;
   }
 
   //multiplies every element of a row vectot by the column of a matrix of same index as the element
@@ -652,7 +692,7 @@ namespace ga_sm {
     of L (which are unity) not stored. This must be a square n x n matrix.
     */
 
-    using cx_helper_func::cx_abs ;//constexpr abs
+    using cx_helper_func::cx_abs; //constexpr abs
     using float_congruent_matrix = static_matrix<float, N, N>;
 
     float_congruent_matrix Out = cast_to<float>(Src);
@@ -703,7 +743,7 @@ namespace ga_sm {
         for (size_t i = 0; i < N; ++i) {
           std::swap(Out(j, i), Out(RIdx[j], i));
         }
-        std::swap(RIdx[j], RIdx[std::find(RIdx.begin(), RIdx.end(), j) - RIdx.begin()]);
+        std::swap(RIdx[j], RIdx[static_cast<size_t>(std::find(RIdx.begin(), RIdx.end(), j) - RIdx.begin())]);
       }
     }
 
@@ -726,7 +766,7 @@ namespace ga_sm {
   or to invert a matrix M : ( M | I ) -> ( I | M^-1 )
   */
   template<typename T, size_t M, size_t N>
-    requires (std::is_floating_point<T>::value and (M <= N))
+    requires (std::is_floating_point_v<T> and (M <= N))
   [[nodiscard]] constexpr 
   bool RREF(static_matrix<T, M, N>& Src) {
 
@@ -767,7 +807,7 @@ namespace ga_sm {
         for (size_t i = 0; i < N; ++i) {
           std::swap(Src(j, i), Src(RIdx[j], i));
         }
-        std::swap(RIdx[j], RIdx[std::find(RIdx.begin(), RIdx.end(), j) - RIdx.begin()]);
+        std::swap(RIdx[j], RIdx[static_cast<size_t>(std::find(RIdx.begin(), RIdx.end(), j) - RIdx.begin())]);
       }
     }
     return true;
@@ -778,13 +818,11 @@ namespace ga_sm {
   Not the most efficient nor stable algorithm 
   Beware of stability problems with singular or close to singularity matrices
   */
-  template<typename T1, typename T2, size_t N>
-    requires std::is_floating_point<T2>::value
+  template<typename T1, typename T2 = double, size_t N>
+    requires std::is_floating_point_v<T2>
   [[nodiscard]] constexpr 
-  bool inverse(
-      static_matrix<T1, N, N> const& Src,
-      static_matrix<T2, N, N>& Dest) {
-
+  std::tuple<bool, static_matrix<T2, N, N>>  inverse(
+      static_matrix<T1, N, N> const& Src) {
     // Tmp == ( M | I )
     static_matrix<T2, N, N * 2> Tmp{};
     //M
@@ -797,17 +835,18 @@ namespace ga_sm {
     for (size_t j = 0; j < N; ++j) {
       Tmp(j, j + N) = 1;
     }
+    //Tmp = ( I | M^-1 )
+    const bool Invertible = RREF(Tmp);
+    static_matrix<T2, N, N> Inverse{};
 
-    bool Invertible{};
-
-    if (Invertible = RREF(Tmp)) {
+    if (Invertible) {
       for (size_t j = 0; j < N; ++j) {
         for (size_t i = 0; i < N; ++i) {
-          Dest(j, i) = Tmp(j, i + N);
+          Inverse(j, i) = Tmp(j, i + N);
         }
       }
     }
-    return Invertible;
+    return { Invertible, Inverse };
   }
 
   template<typename T, size_t N>
@@ -858,13 +897,12 @@ namespace ga_sm {
 
     using cx_helper_func::cx_abs;
     double L1{};
-
     for (size_t j = 0; j < M; ++j) {
       for (size_t i = 0; i < N; ++i) {
         L1 += static_cast<double>(cx_abs(Mat1(j, i) - Mat2(j, i)));
       }
     }
-    return L1 / static_cast<double>(M + N);
+    return L1 / static_cast<double>(M * N);
   }
 
   /*
@@ -874,8 +912,8 @@ namespace ga_sm {
   template<typename T, size_t M, size_t N>
   [[nodiscard]] constexpr 
   static_matrix<T, M, N> matrix_average(
-      const std::same_as<static_matrix<T, M, N>> auto& ... Mats) {
-    return (Mats + ...) / sizeof...(Mats);
+      std::same_as<static_matrix<T, M, N>> auto const& ... mats) {
+    return (mats + ...) / sizeof...(mats);
   }
 
 

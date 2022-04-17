@@ -13,7 +13,7 @@ namespace _c4_brain {
 		std::atomic<uint_fast16_t> ties = 0;
 		uint_fast32_t ID = ++s_ID;
 		std::vector<uint_fast8_t> shape;
-//static variable
+//static variables
     static uint_fast32_t s_ID;
 
 	public:

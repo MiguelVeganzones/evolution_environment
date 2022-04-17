@@ -8,6 +8,7 @@ public:
 	static void init();
 
 	static float randfloat();
+  //static float randfloat_2();
 
 	static int randint(int Min, int Max);
 

@@ -14,18 +14,25 @@ std::mutex mu_randnormal;
 
 void random::init()
 {
-    s_random_engine.seed((unsigned int)std::chrono::high_resolution_clock::now().time_since_epoch().count());
+    s_random_engine.seed(static_cast<unsigned int>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
 }
 
 float random::randfloat()
 {
-    return (float)s_distribution(random::s_random_engine) / (float)std::numeric_limits<uint32_t>::max();
+    return static_cast<float>(s_distribution(random::s_random_engine))
+         / static_cast<float>(std::numeric_limits<uint32_t>::max());
 }
+
+//float random::randfloat_2()
+//{
+//  return std::uniform_real_distribution<float>{ 0, 1 }(random::s_random_engine);
+//}
 
 float random::mt_randfloat()
 {
     mu_randfloat.lock();
-    const float f = (float)s_distribution(random::s_random_engine) / (float)std::numeric_limits<uint32_t>::max();
+    const float f = static_cast<float>(s_distribution(random::s_random_engine))
+                  / static_cast<float>(std::numeric_limits<uint32_t>::max());
     mu_randfloat.unlock();
     return f;
 }

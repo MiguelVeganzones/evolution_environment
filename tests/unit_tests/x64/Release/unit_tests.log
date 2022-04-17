@@ -1,2 +1,15 @@
-﻿  unit_tests.cpp
-D:\proyects\c++\visual studio\evolution_environment\tests\unit_tests\unit_tests.cpp(2,10): fatal error C1853: 'x64\Release\unit_tests.pch' precompiled header file is from a different version of the compiler, or the precompiled header is C++ and you are using it from C (or vice versa)
+﻿  pch.cpp
+  unit_tests.cpp
+D:\proyects\c++\visual studio\evolution_environment\tests\unit_tests\unit_tests.cpp(32,10): warning C4244: '*=': conversion from 'double' to 'unsigned int', possible loss of data
+D:\proyects\c++\visual studio\evolution_environment\tests\unit_tests\unit_tests.cpp(33,10): warning C4244: '*=': conversion from 'double' to 'unsigned int', possible loss of data
+D:\proyects\c++\visual studio\evolution_environment\tests\unit_tests\unit_tests.cpp(34,10): warning C4244: '*=': conversion from 'double' to 'unsigned int', possible loss of data
+D:\proyects\c++\visual studio\evolution_environment\tests\unit_tests\unit_tests.cpp(54,10): warning C4244: '*=': conversion from 'double' to 'unsigned int', possible loss of data
+D:\proyects\c++\visual studio\evolution_environment\tests\unit_tests\unit_tests.cpp(55,10): warning C4244: '*=': conversion from 'double' to 'unsigned int', possible loss of data
+D:\proyects\c++\visual studio\evolution_environment\tests\unit_tests\unit_tests.cpp(75,10): warning C4244: '*=': conversion from 'double' to 'unsigned int', possible loss of data
+D:\proyects\c++\visual studio\evolution_environment\tests\unit_tests\unit_tests.cpp(76,10): warning C4244: '*=': conversion from 'double' to 'unsigned int', possible loss of data
+     Creating library D:\proyects\c++\visual studio\evolution_environment\build\x64\Release\unit_tests.lib and object D:\proyects\c++\visual studio\evolution_environment\build\x64\Release\unit_tests.exp
+  Generating code
+  Previous IPDB was built with incompatible compiler, fall back to full compilation.
+  All 308 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  unit_tests.vcxproj -> D:\proyects\c++\visual studio\evolution_environment\build\x64\Release\unit_tests.dll

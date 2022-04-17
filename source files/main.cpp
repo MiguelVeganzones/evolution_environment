@@ -635,14 +635,16 @@ constexpr bool main22() {
 
 	
 	static_matrix<int, N, N> sm1{};
-	static_matrix<double, N, N> sm2{}, sm3{};
+	static_matrix<double, N, N> sm2;
 
 	sm1 = { 1,2,3,4,5,6,7,8,9,10,11,1,13,4,5,6 };
 	sm2 = cast_to<double>(sm1);
 
 	bool b{0};
 
-	if (inverse(sm2, sm3)) {
+  auto [invertible, sm3] = inverse(sm2);
+
+	if (invertible) {
 		//auto a = PII_LUDecomposition(sm2);
 		//std::cout << matrix_mul(sm2, sm3) << std::endl;
 		b = (matrix_mul(sm2, sm3) == identity_matrix<double, N>());
@@ -680,7 +682,7 @@ bool main24() {
 
 
   static_matrix<int, N, N> sm1;
-	static_matrix<double, N, N> sm2{}, sm3{}, sm11{}, sm12{};
+	static_matrix<double, N, N> sm2{}, sm11{}, sm12{};
 
 	sm1 = { 1,2,3,4,5,6,7,8,9,10,11,1,13,4,5,6 };
   sm12 = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 };
@@ -691,7 +693,9 @@ bool main24() {
 	bool b{ 0 };
   std::cout << sm2 << std::endl;
 
-	if (inverse(sm2, sm3)) {
+  auto [invertible, sm3] = inverse(sm2);
+
+	if (invertible) {
 		std::cout << sm3 << std::endl;
 		std::cout << determinant(sm1) << "\n";
 		std::cout << matrix_mul(sm2, sm3) << std::endl;
@@ -703,8 +707,9 @@ bool main24() {
 
 int matrix_mul_bench() {
   using namespace ga_sm;
-  constexpr size_t N = 30;
-  static_matrix<float, N, N> sm1{}, sm2{}, sm3{}, sm4{};
+  constexpr size_t N = 50;
+  static_matrix<float, N, N> sm1{};
+  static_matrix<float, N, 1> sm2{}, sm3{}, sm4{};
 
   {
     stopwatch s;
@@ -714,6 +719,10 @@ int matrix_mul_bench() {
   {
     stopwatch s;
     sm3 = matrix_mul(sm1, sm2);
+  } 
+  {
+    stopwatch s;
+    sm4 = matrix_vector_mul_float_avx(sm1, sm2);
   }
 
   std::cout << (sm3 == sm4) << "\n";
@@ -722,8 +731,7 @@ int matrix_mul_bench() {
 }
 
 
-
-int main() {
+int main25() {
 
   //random::init();
   stopwatch s0;
@@ -733,7 +741,7 @@ int main() {
 
   //ga_sm_nn::static_neural_net<float, a1, a2 , a2> nn{};
 
-  ga_sm::static_matrix<float, 2, 2> in{};
+  ga_sm::static_matrix<float, 6, 7> in{};
   in.fill<random::randfloat>();
 
   //ga_sm_nn::layer<float, ga_sm_nn::Layer_Shape{ 3,1 }, 6, 4> l1{};
@@ -750,15 +758,25 @@ int main() {
   constexpr Layer_Shape a4{ 4,4 };
   constexpr Layer_Shape a6{ 6,6 };
   constexpr Layer_Shape a67{ 6,7 };
+  constexpr Layer_Shape a10{ 10,10 };
 
 
-  static_neural_net<float, a2, a2, a1> nn1{}, nn2;
+
+  static_neural_net<float, a67, a6, a6, a6, a3, a21> nn1{}, nn2{};
   //
   //
+
+  std::array<decltype(nn1), 2>a{ nn1,nn2 };
+  std::cout << "L11:\n" << population_variability(std::array{nn1, nn2});
 
 
   nn1.init<random::randnormal, 0, 1>();
   nn2.init<random::randnormal, 0, 1>();
+
+  nn1.print_net();
+  nn2.print_net();
+
+  std::cout << "L11:\n" << population_variability(std::array{ nn1, nn2 });
 
   auto ret = x_crossover(nn1, nn2);
 
@@ -767,17 +785,123 @@ int main() {
   //ret.first.print_net();
   //ret.second.print_net();
 
-  static_neural_net<float, a2, a2, a1> nn3{};
+  decltype(nn2) nn3{};
 
   nn2.store("prueba0.txt");
   nn3.load("prueba0.txt");
 
-  nn3.print_net();
+  nn3.init<random::randnormal, 0, 1>();
 
-  std::cout << nn3.parameters() << "\n";
+  std::cout << "L11:\n" << population_variability(std::array{ nn1, nn2, nn3, ret.first, ret.second });
+
+  std::cout << sizeof(decltype(nn3)) << '\n';
+  std::cout << nn3.parameter_count() << "\n";
+  std::cout << ((double)sizeof(decltype(nn3)) / (double)nn3.parameter_count()) << "\n";
+
+
+  //nn3.print_net();
+
+  //std::cout << nn3.parameter_count() << "\n";
+  std::cout << "Output: \n" << nn2.forward_pass(in) << '\n';
+  double sum = 0;
   {
     stopwatch s1;
-    std::cout << nn3.forward_pass(in);
+    for (size_t i = 0; i < 1e4; ++i) {
+      sum += static_cast<double>(nn2.forward_pass(in)(0,0));
+      in.mutate<random::randfloat>(0, 1, 0.2, 0.4);
+    }
   }
+  std::cout << sum << '\n';
+
+
+  _ga_nn::neural_net net1({ 6,7,4,4,3,3,2,2,2,1 });
+
+  
+  //std::cout << net1.parameter_count() << "\n";
+  //_matrix::matrix<float> m(6, 7);
+  //{
+  //  stopwatch s2;
+  //  net1.forard_pass(m);
+  //}
+
+  return EXIT_SUCCESS;
+}
+
+
+int main() {
+  //main14();
+  //main25();
+  main24();
+  using namespace ga_sm;
+  //constexpr size_t N = 20;
+
+  //auto sm1 = std::make_unique<static_matrix<float, N, N>>();
+  //auto sm2 = std::make_unique<static_matrix<float, N, N>>();
+
+  //sm1->fill<random::randfloat>();
+  //sm2->fill<random::randfloat>();
+  //
+  //auto sm3 = std::make_unique<static_matrix<float, N, N>>(matrix_mul(*sm1.get(), *sm2.get()));
+
+  //std::cout << sm3->operator()(0, 0) << "\n";
+
+  matrix_mul_bench();
+  std::cout << ".......\n";
+
+
+  constexpr size_t N = 50, M = 40, K = 5e5;
+  static_matrix<float, M, N> sm1{};
+  static_matrix<float, N, 1> sm2{};
+  static_matrix<float, M, 1> a{}, b{};
+
+  sm1.fill<random::randfloat>();
+  sm2.fill<random::randfloat>();
+
+  float randn{};
+  {
+    stopwatch s1;
+    for (size_t i = 0; i < K; ++i) {
+      randn += random::randfloat();
+    }
+  }
+  float randn2{};
+  {
+    stopwatch s1;
+    for (size_t i = 0; i < K; ++i) {
+      randn2 += random::randfloat();
+    }
+  }
+
+  std::cout << randn << "\n" << randn2 << "\n";
+
+  //std::cout << sm1 << '\n' << sm2 << '\n';
+  float ad{}, bd{};
+  {
+    stopwatch s;
+    for (size_t i = 0; i < K; ++i) {
+      sm1(random::randint(0,4), 0) = random::randfloat();
+      sm2(1, 1) = random::randfloat();
+      a = matrix_mul(sm1, sm2);
+      ad += a(0, 0);
+    }
+  }
+  {
+    stopwatch s;
+    for (size_t i = 0; i < K; ++i) {
+      sm1(random::randint(0, 4),0) = random::randfloat();
+      sm2(1,1) = random::randfloat();
+      b = matrix_vector_mul_float_avx(sm1, sm2);
+      bd += b(0, 0);
+    }
+  }
+
+  sm1.fill<random::randfloat>();
+  sm2.fill<random::randfloat>();
+  a = matrix_mul(sm1, sm2);
+  b = matrix_vector_mul_float_avx(sm1, sm2);
+
+  std::cout << ad << " " << bd << "\n";
+  std::cout << nearly_equals(a, b) << std::endl;
+
   return EXIT_SUCCESS;
 }
